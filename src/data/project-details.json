@@ -1,0 +1,99 @@
+{
+    "legacy-erp-migration": {
+        "header": {
+            "category": "FinTech Case Study",
+            "icon": "cloud_sync",
+            "title": "Legacy ERP Migration",
+            "subtitle": "A 12-month initiative to modernize core banking infrastructure, moving from an on-premise monolith to a scalable AWS microservices architecture.",
+            "tags": [
+                "System Migration",
+                "Data Modeling",
+                "Stakeholder Mgmt",
+                "Agile/Scrum"
+            ]
+        },
+        "problem": {
+            "content": "The existing 15-year-old ERP system was causing significant bottlenecks. Reporting took 48 hours to generate, data redundancy was high (approx. 40%), and maintenance costs were rising by 15% YoY. The system could not support the new mobile banking features planned for Q4."
+        },
+        "solution": {
+            "content": "We designed a phased migration plan to a cloud-native architecture. I mapped out the AS-IS and TO-BE processes using BPMN, identified 12 core microservices, and established a data lake strategy for real-time reporting using Snowflake and AWS Glue."
+        },
+        "deliverables": [
+            {
+                "icon": "description",
+                "title": "Documentation",
+                "description": "Authored <strong>25+ detailed PRDs</strong> for engineering teams covering Authentication, Ledger, and Reporting modules."
+            },
+            {
+                "icon": "schema",
+                "title": "Visual Modeling",
+                "description": "Created comprehensive <strong>UML Diagrams</strong> (Sequence, Activity, ERD) to visualize data flow between microservices."
+            },
+            {
+                "icon": "group",
+                "title": "Stakeholder Mgmt",
+                "description": "Facilitated weekly backlog grooming sessions and served as the primary liaison between business stakeholders and developers."
+            },
+            {
+                "icon": "database",
+                "title": "Data Analysis",
+                "description": "Performed SQL gap analysis to map 5,000+ data fields from legacy schemas to the new Snowflake EDW."
+            }
+        ],
+        "outcomes": [
+            {
+                "value": "40%",
+                "label": "Redundancy Reduced"
+            },
+            {
+                "value": "200%",
+                "label": "Faster Reporting"
+            },
+            {
+                "value": "$150k",
+                "label": "Annual Savings"
+            },
+            {
+                "value": "0",
+                "label": "Downtime Hours"
+            }
+        ],
+        "techStack": [
+            {
+                "name": "Jira",
+                "icon": "sticky_note_2",
+                "color": "blue"
+            },
+            {
+                "name": "SQL",
+                "icon": "database",
+                "color": "orange"
+            },
+            {
+                "name": "Visio",
+                "icon": "flowsheet",
+                "color": "indigo"
+            },
+            {
+                "name": "Snowflake",
+                "icon": "cloud",
+                "color": "sky"
+            },
+            {
+                "name": "Postman",
+                "icon": "api",
+                "color": "yellow"
+            }
+        ],
+        "navigation": {
+            "prev": {
+                "title": "Supply Chain API",
+                "slug": "supply-chain-api"
+            },
+            "next": {
+                "title": "CRM Integration",
+                "slug": "crm-integration"
+            }
+        }
+    }
+}

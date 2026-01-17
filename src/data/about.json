@@ -1,0 +1,86 @@
+{
+    "header": {
+        "title": "Behind the Analysis",
+        "subtitle": "My journey from curiosity to architecting business solutions."
+    },
+    "story": {
+        "tag": "Story",
+        "year": "Est. 2018",
+        "title": "It started with a broken spreadsheet.",
+        "content": [
+            "My path into tech wasn't traditional. While working in operations, I noticed my team spending hours manually reconciling data across three different systems. I couldn't ignore the inefficiency.",
+            "I taught myself SQL on weekends to automate those reports. That first \"aha\" moment—seeing a 4-hour task turn into a 5-second query—hooked me on problem-solving. Today, I bring that same relentless drive for efficiency to enterprise-scale systems, bridging the gap between business goals and technical reality."
+        ],
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAWjvILIy-MRe8QkzerFcRYAoHsgHvR3DFtMm9g12gFfKmnscj97trw_-psr6n4aUTp9KQKV9wcw5G5G_w6W0XHWHescRxZJl1hKaTANKcat3QRHey2wpQ3dtr68ODq2fqm0xke6jWZlYLyWQG-_th888szWDFM7A9rnQVRp5KC3FJAUH0vQThTzdeJfS5_yk3h0rxoFIRQYyJf7F7i5aGHmSzyy8zTUunDQjxnS_z7PKEjoWldZ81BL3xySW7M136V46VWQMs4fQFB"
+    },
+    "funFact": {
+        "title": "Fun Fact",
+        "description": "I'm an avid puzzle solver. I recently completed a 3,000-piece map of the world without looking at the box picture. It taught me patience and pattern recognition!"
+    },
+    "education": {
+        "degree": {
+            "title": "B.S. Information Systems",
+            "school": "University of Technology",
+            "year": "2014 - 2018"
+        },
+        "certs": [
+            {
+                "title": "CSPO®",
+                "subtitle": "Certified Scrum Product Owner",
+                "icon": "verified_user"
+            },
+            {
+                "title": "IIBA-CBAP",
+                "subtitle": "Certified Business Analysis Professional",
+                "icon": "badge"
+            },
+            {
+                "title": "AWS Certified",
+                "subtitle": "Cloud Practitioner",
+                "icon": "cloud"
+            }
+        ]
+    },
+    "experience": [
+        {
+            "role": "Senior Business System Analyst",
+            "company": "FinTech Corp • New York, NY",
+            "year": "2021 - Present",
+            "color": "blue",
+            "highlights": [
+                "Spearheaded the migration of legacy CRM to Salesforce, reducing data redundancy by <strong>40%</strong> and improving reporting speed by 200%.",
+                "Led requirement gathering workshops for 5 major product releases, acting as the primary liaison between stakeholders and dev teams.",
+                "Implemented automated testing protocols that cut QA cycle time by 3 days per sprint."
+            ],
+            "tags": [
+                "JIRA",
+                "Salesforce",
+                "Agile"
+            ]
+        },
+        {
+            "role": "Business Analyst",
+            "company": "Global Logistics Ltd. • Chicago, IL",
+            "year": "2019 - 2021",
+            "color": "gray",
+            "highlights": [
+                "Optimized warehouse inventory tracking system, achieving a <strong>15% reduction</strong> in stock discrepancies.",
+                "Created comprehensive documentation (BRD, FRD) for internal API integrations."
+            ]
+        },
+        {
+            "role": "Junior System Analyst",
+            "company": "TechStart Solutions • Remote",
+            "year": "2018 - 2019",
+            "color": "gray",
+            "highlights": [
+                "Assisted in UAT coordination and bug tracking using Azure DevOps.",
+                "Reduced system downtime by <strong>20%</strong> through proactive monitoring dashboard implementation."
+            ]
+        }
+    ],
+    "offline": {
+        "title": "Offline Mode",
+        "description": "When I'm not mapping processes, I'm mapping trails. I spend my weekends hiking the Catskills—nature is the best system reset."
+    }
+}

@@ -36,7 +36,7 @@ export default function DashboardPage() {
                             <div key={i} className="flex items-center gap-4 border-b border-gray-100 dark:border-gray-800 pb-4 last:border-0 last:pb-0">
                                 <div className="size-8 rounded-full bg-primary/20" />
                                 <div className="space-y-1">
-                                    <p className="text-sm font-medium leading-none">Updated "E-commerce API" project</p>
+                                    <p className="text-sm font-medium leading-none">Updated &quot;E-commerce API&quot; project</p>
                                     <p className="text-xs text-text-muted">2 hours ago</p>
                                 </div>
                             </div>

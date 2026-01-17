@@ -1,0 +1,40 @@
+{
+    "migrating-legacy-monoliths": {
+        "header": {
+            "category": "Case Study",
+            "title": "Migrating Legacy Monoliths: A BSA Perspective",
+            "author": "Sarah Jenkins",
+            "date": "Sep 12, 2024",
+            "readTime": "12 min read",
+            "authorImage": "https://lh3.googleusercontent.com/aida-public/AB6AXuAWjvILIy-MRe8QkzerFcRYAoHsgHvR3DFtMm9g12gFfKmnscj97trw_-psr6n4aUTp9KQKV9wcw5G5G_w6W0XHWHescRxZJl1hKaTANKcat3QRHey2wpQ3dtr68ODq2fqm0xke6jWZlYLyWQG-_th888szWDFM7A9rnQVRp5KC3FJAUH0vQThTzdeJfS5_yk3h0rxoFIRQYyJf7F7i5aGHmSzyy8zTUunDQjxnS_z7PKEjoWldZ81BL3xySW7M136V46VWQMs4fQFB"
+        },
+        "content": [
+            "<p class=\"text-xl md:text-2xl font-medium text-text-muted dark:text-gray-400 leading-relaxed\">When a financial institution decides to move away from a 20-year-old mainframe system, the challenge isn't just code—it's understanding the ghost logic buried in decades of patches.</p>",
+            "<p>The first step in any successful migration isn't choosing the cloud provider; it's mapping the current state. We often find that documentation hasn't been updated since the initial release. My approach starts with \"Forensic Requirement Analysis\"—essentially interviewing the code through database schema analysis and user behavior tracking.</p>",
+            "<p>In my experience with Tier-1 banking systems, approximately 30% of legacy codebase consists of \"dead logic\"—features built for regulations that were repealed years ago or marketing campaigns that ended in the early 2000s. Identifying this debris early is crucial. It prevents the team from wasting thousands of hours migrating functionality that adds zero value to the modern business.</p>",
+            "<div class=\"my-10 p-8 bg-background-light dark:bg-black/20 rounded-2xl border-l-4 border-primary\"><span class=\"material-symbols-outlined text-4xl text-primary mb-4\">format_quote</span><p class=\"italic text-xl text-text-muted dark:text-gray-400 font-medium m-0 leading-relaxed\">\"The goal isn't just to replicate features, but to reimagine the business capability using modern patterns.\"</p></div>",
+            "<h3 class=\"text-2xl font-bold text-text-main dark:text-white mt-10 mb-4\">Unifying the Data Model</h3>",
+            "<p>During the discovery phase, we identified three critical data flows that were redundant. By creating a unified data model, we eliminated synchronization issues that had plagued the customer service team for years. The original system required nightly batch jobs to align account balances; the new architecture handled this in real-time.</p>",
+            "<p>This transition wasn't just technical. It required extensive stakeholder management to convince the Risk department that real-time processing was actually <em>safer</em> than their trusted batch reports. By demonstrating the audit trail capabilities of the new event-driven architecture, we turned our biggest skeptics into our strongest advocates.</p>",
+            "<p>Ultimately, the success of a monolith migration hinges on the BSA's ability to translate technical debt into business risk, and technical modernization into business velocity.</p>"
+        ],
+        "comments": [
+            {
+                "author": "Michael King",
+                "initials": "MK",
+                "initialsColor": "blue",
+                "date": "2 days ago",
+                "content": "Great point about \"Forensic Requirement Analysis\". I've found that database schemas often tell a truer story than the functional specs from 2005. The hidden constraints in the DB are usually where the real business rules live.",
+                "likes": 12
+            },
+            {
+                "author": "Anna Li",
+                "initials": "AL",
+                "initialsColor": "purple",
+                "date": "5 hours ago",
+                "content": "This is exactly what I needed. Would love to see a follow-up on how you handled the testing phase for these migrations. Specifically, did you use parallel running strategies?",
+                "likes": 5
+            }
+        ]
+    }
+}

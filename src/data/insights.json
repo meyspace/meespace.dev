@@ -1,0 +1,46 @@
+{
+    "header": {
+        "title": "BSA Insights",
+        "description": "Thought leadership on system analysis, process optimization, and bridging the gap between business and technology."
+    },
+    "latestPost": {
+        "slug": "migrating-legacy-monoliths",
+        "category": "Case Study",
+        "readTime": "12 min read",
+        "title": "Migrating Legacy Monoliths: A BSA Perspective",
+        "excerpt": "When a financial institution decides to move away from a 20-year-old mainframe system, the challenge isn't just code—it's understanding the ghost logic buried in decades of patches.",
+        "author": "Sarah Jenkins",
+        "date": "Sep 12, 2024",
+        "image": "https://lh3.googleusercontent.com/aida-public/AB6AXuAWjvILIy-MRe8QkzerFcRYAoHsgHvR3DFtMm9g12gFfKmnscj97trw_-psr6n4aUTp9KQKV9wcw5G5G_w6W0XHWHescRxZJl1hKaTANKcat3QRHey2wpQ3dtr68ODq2fqm0xke6jWZlYLyWQG-_th888szWDFM7A9rnQVRp5KC3FJAUH0vQThTzdeJfS5_yk3h0rxoFIRQYyJf7F7i5aGHmSzyy8zTUunDQjxnS_z7PKEjoWldZ81BL3xySW7M136V46VWQMs4fQFB"
+    },
+    "topics": [
+        "Technical Writing",
+        "Agile",
+        "Case Study",
+        "SQL",
+        "Stakeholder Mgmt"
+    ],
+    "posts": [
+        {
+            "slug": "why-uml-still-matters",
+            "category": "Technical",
+            "categoryColor": "blue",
+            "title": "Why UML Still Matters",
+            "excerpt": "In an agile world, diagrams are often overlooked. Here is why visual modeling is still the universal language of complex systems."
+        },
+        {
+            "slug": "effective-stakeholder-management",
+            "category": "Soft Skills",
+            "categoryColor": "green",
+            "title": "Effective Stakeholder Management",
+            "excerpt": "Navigating conflicting requirements between engineering leads and product managers without losing your sanity."
+        },
+        {
+            "slug": "from-junior-to-senior-bsa",
+            "category": "Career",
+            "categoryColor": "orange",
+            "title": "From Junior to Senior BSA",
+            "excerpt": "Key milestones and skills you need to master to move up the ladder in the business analysis career path."
+        }
+    ]
+}

@@ -1,0 +1,90 @@
+{
+    "sidebar": {
+        "title": "Project Navigation",
+        "links": [
+            {
+                "label": "All Projects",
+                "icon": "grid_view",
+                "active": true
+            },
+            {
+                "label": "Legacy ERP Migration",
+                "color": "blue"
+            },
+            {
+                "label": "CRM Integration",
+                "color": "purple"
+            },
+            {
+                "label": "FinTech Data Warehouse",
+                "color": "green"
+            },
+            {
+                "label": "Supply Chain API",
+                "color": "orange"
+            }
+        ],
+        "cta": {
+            "title": "Need a BSA?",
+            "description": "I'm currently available for new contract opportunities.",
+            "button": "Let's Talk"
+        }
+    },
+    "main": {
+        "title": "Selected Projects",
+        "categories": [
+            "FinTech",
+            "SaaS"
+        ]
+    },
+    "projects": [
+        {
+            "title": "Legacy ERP Migration",
+            "description": "Comprehensive analysis and migration strategy for moving a 15-year old on-premise ERP to a microservices cloud architecture.",
+            "icon": "cloud_sync",
+            "category": "Cloud Migration",
+            "categoryColor": "blue",
+            "tags": [
+                "JIRA",
+                "SQL",
+                "Visio"
+            ]
+        },
+        {
+            "title": "Salesforce Integration",
+            "description": "Led the requirements gathering for a two-way sync between custom internal tools and Salesforce CRM to improve sales tracking.",
+            "icon": "hub",
+            "category": "CRM System",
+            "categoryColor": "purple",
+            "tags": [
+                "Salesforce",
+                "API REST",
+                "UML"
+            ]
+        },
+        {
+            "title": "FinTech Data Warehouse",
+            "description": "Designed the data schema and reporting requirements for a new executive dashboard consolidating 5 different data streams.",
+            "icon": "monitoring",
+            "category": "Data Viz",
+            "categoryColor": "green",
+            "tags": [
+                "Tableau",
+                "Snowflake",
+                "Python"
+            ]
+        },
+        {
+            "title": "Mobile Inventory API",
+            "description": "Defined functional specifications for a mobile app allowing warehouse staff to scan and update inventory in real-time.",
+            "icon": "inventory_2",
+            "category": "Supply Chain",
+            "categoryColor": "orange",
+            "tags": [
+                "Postman",
+                "Figma",
+                "iOS"
+            ]
+        }
+    ]
+}

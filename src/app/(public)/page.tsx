@@ -228,9 +228,9 @@ export default function Home() {
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/40 dark:bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 relative z-10">
               <div className="flex flex-col justify-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-text-main dark:text-white mb-4">Let's collaborate on your next system migration</h2>
+                <h2 className="text-3xl md:text-4xl font-bold text-text-main dark:text-white mb-4">Let&apos;s collaborate on your next system migration</h2>
                 <p className="text-text-muted dark:text-gray-300 mb-8 text-lg">
-                  Whether you need help with requirements gathering, process optimization, or technical documentation, I'm just a message away.
+                  Whether you need help with requirements gathering, process optimization, or technical documentation, I&apos;m just a message away.
                 </p>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3 text-text-main dark:text-white">

@@ -24,15 +24,30 @@ export function Header() {
                 </div>
 
                 <nav className="hidden md:flex items-center gap-8">
-                    {["About", "Projects", "Blog", "Contact"].map((item) => (
-                        <button
-                            key={item}
-                            onClick={() => scrollToSection(item.toLowerCase())}
-                            className="text-text-main dark:text-gray-300 hover:text-primary-dark transition-colors text-sm font-medium"
-                        >
-                            {item}
-                        </button>
-                    ))}
+                    <Link
+                        href="/"
+                        className="text-text-main dark:text-gray-300 hover:text-primary-dark transition-colors text-sm font-medium"
+                    >
+                        Home
+                    </Link>
+                    <Link
+                        href="/about"
+                        className="text-text-main dark:text-gray-300 hover:text-primary-dark transition-colors text-sm font-medium"
+                    >
+                        About
+                    </Link>
+                    <Link
+                        href="/insights"
+                        className="text-text-main dark:text-gray-300 hover:text-primary-dark transition-colors text-sm font-medium"
+                    >
+                        Insights
+                    </Link>
+                    <Link
+                        href="/projects"
+                        className="text-text-main dark:text-gray-300 hover:text-primary-dark transition-colors text-sm font-medium"
+                    >
+                        Projects
+                    </Link>
                 </nav>
 
                 <div className="flex items-center gap-2">
