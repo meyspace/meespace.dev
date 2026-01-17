@@ -21,7 +21,7 @@ export default function AdminLoginPage() {
                     title="Welcome Back"
                     subtitle="Sign in to manage your BSA portfolio"
                 >
-                    <form action="#" method="POST" className="space-y-5">
+                    <form action="/admin/dashboard" className="space-y-5">
                         <AuthInput
                             label="Email address"
                             id="email"
@@ -44,7 +44,9 @@ export default function AdminLoginPage() {
                         />
 
                         <div>
-                            <AuthButton type="submit">Sign In</AuthButton>
+                            <Link href="/admin/dashboard">
+                                <AuthButton type="button">Sign In</AuthButton>
+                            </Link>
                         </div>
                     </form>
 

@@ -1,0 +1,47 @@
+[
+    {
+        "id": "PRJ-2024-001",
+        "title": "E-commerce API Integration",
+        "category": "System Design",
+        "date": "Oct 24, 2023",
+        "status": "Published",
+        "icon": "shopping_cart",
+        "iconColor": "blue"
+    },
+    {
+        "id": "PRJ-2024-002",
+        "title": "Healthcare Patient Portal",
+        "category": "UX/UI Design",
+        "date": "Nov 12, 2023",
+        "status": "Published",
+        "icon": "local_hospital",
+        "iconColor": "purple"
+    },
+    {
+        "id": "PRJ-2024-003",
+        "title": "Inventory Management System",
+        "category": "Full Stack Dev",
+        "date": "Dec 05, 2023",
+        "status": "Draft",
+        "icon": "inventory_2",
+        "iconColor": "orange"
+    },
+    {
+        "id": "PRJ-2023-018",
+        "title": "Legacy CRM Migration",
+        "category": "Database",
+        "date": "Aug 15, 2023",
+        "status": "Archived",
+        "icon": "archive",
+        "iconColor": "gray"
+    },
+    {
+        "id": "PRJ-2024-004",
+        "title": "Supply Chain Optimization",
+        "category": "Data Analytics",
+        "date": "Jan 10, 2024",
+        "status": "Published",
+        "icon": "analytics",
+        "iconColor": "teal"
+    }
+]

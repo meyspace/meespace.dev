@@ -7,7 +7,7 @@ import {
     FileText,
     Briefcase,
     MessageSquare,
-    Settings,
+    // Settings is unused
     LogOut,
     PenTool,
 } from "lucide-react";

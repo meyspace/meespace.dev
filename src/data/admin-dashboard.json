@@ -1,0 +1,95 @@
+{
+    "user": {
+        "name": "Sarah Jenkins",
+        "role": "Admin",
+        "avatar": "/images/avatar-placeholder.png"
+    },
+    "stats": [
+        {
+            "label": "Total Projects",
+            "value": "12",
+            "change": "+2 new",
+            "icon": "folder_managed",
+            "color": "blue"
+        },
+        {
+            "label": "Blog Views",
+            "value": "3.4k",
+            "change": "+12%",
+            "icon": "visibility",
+            "color": "purple"
+        },
+        {
+            "label": "Contact Inquiries",
+            "value": "8",
+            "change": "Today",
+            "changeType": "neutral",
+            "icon": "mail",
+            "color": "orange"
+        },
+        {
+            "label": "Newsletter Subs",
+            "value": "854",
+            "change": "+24",
+            "icon": "mark_email_read",
+            "color": "green"
+        }
+    ],
+    "activity": [
+        {
+            "title": "Updated \"Supply Chain Optimization\"",
+            "description": "Added new UML diagrams to section 3.",
+            "time": "2 hours ago",
+            "icon": "edit",
+            "color": "blue"
+        },
+        {
+            "title": "Published \"The Art of Writing PRDs\"",
+            "description": "Article is now live on the blog.",
+            "time": "Yesterday, 4:30 PM",
+            "icon": "publish",
+            "color": "green"
+        },
+        {
+            "title": "New Inquiry from TechCorp",
+            "description": "Received a project proposal request.",
+            "time": "Yesterday, 9:15 AM",
+            "icon": "mail",
+            "color": "orange"
+        },
+        {
+            "title": "System Settings Updated",
+            "description": "SEO configuration changes saved.",
+            "time": "2 days ago",
+            "icon": "settings",
+            "color": "purple"
+        },
+        {
+            "title": "Automatic Backup",
+            "description": "Database backup completed successfully.",
+            "time": "3 days ago",
+            "icon": "backup",
+            "color": "gray"
+        }
+    ],
+    "analytics": {
+        "days": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri",
+            "Sat",
+            "Sun"
+        ],
+        "values": [
+            40,
+            65,
+            45,
+            80,
+            95,
+            55,
+            70
+        ]
+    }
+}
