@@ -321,6 +321,139 @@ return <h1>{userProfile.name}</h1>;
 
 ---
 
+## 🏗️ Adding New Pages
+
+### 1. Public Pages (e.g., About, Services)
+To add a new public page like `/about`:
+
+1.  Create a folder: `src/app/(public)/about`
+2.  Create `page.tsx`:
+    ```tsx
+    import { Metadata } from "next";
+
+    export const metadata: Metadata = {
+      title: "About Me",
+      description: "My professional journey...",
+    };
+
+    export default function AboutPage() {
+      return (
+        <main className="container py-20">
+          <h1 className="text-4xl font-bold">About Me</h1>
+          {/* Content */}
+        </main>
+      );
+    }
+    ```
+
+### 2. Admin Pages (e.g., Settings, Analytics)
+To add a new admin page like `/dashboard/settings`:
+
+1.  Create feature folder: `src/app/(admin)/dashboard/settings`
+2.  Create `page.tsx`.
+3.  **Authentication is auto-handled** by the layout in `(admin)`.
+
+---
+
+## 🔌 End-to-End Backend Integration
+
+Follow this 5-step workflow to build a full CRUD feature (e.g., "Projects").
+
+### Step 1: Database (Supabase)
+Create your table in Supabase SQL Editor:
+```sql
+create table projects (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  description text,
+  image_url text,
+  created_at timestamp with time zone default now()
+);
+```
+
+### Step 2: Types (`src/types/`)
+Define the TypeScript interface in `src/types/project.ts`:
+```typescript
+export interface Project {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  created_at: string;
+}
+```
+
+### Step 3: Schema (`src/lib/schemas/`)
+Define Zod schema for validation in `src/lib/schema.ts` (or feature specific):
+```typescript
+import { z } from "zod";
+
+export const ProjectSchema = z.object({
+  title: z.string().min(3, "Title too short"),
+  description: z.string().optional(),
+});
+```
+
+### Step 4: Server Action (`src/actions/`)
+Create `src/actions/project.ts`. **Always use "use server"**.
+
+```typescript
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { ProjectSchema } from "@/lib/schema";
+import { revalidatePath } from "next/cache";
+
+export async function createProject(formData: FormData) {
+  // 1. Validate
+  const validated = ProjectSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+  });
+
+  if (!validated.success) return { error: validated.error.flatten() };
+
+  // 2. Auth & DB
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("projects")
+    .insert(validated.data);
+
+  if (error) return { error: error.message };
+
+  // 3. Revalidate & Redirect
+  revalidatePath("/dashboard/projects");
+  return { success: true };
+}
+```
+
+### Step 5: UI Component (`src/components/`)
+Connect the action to a Client Component form.
+
+```tsx
+"use client";
+
+import { createProject } from "@/actions/project";
+
+export function ProjectForm() {
+  async function handleSubmit(formData: FormData) {
+    const result = await createProject(formData);
+    if (result.error) alert("Error!");
+    else alert("Success!");
+  }
+
+  return (
+    <form action={handleSubmit}>
+      <input name="title" placeholder="Project Title" required />
+      <textarea name="description" placeholder="Description" />
+      <button type="submit">Save Project</button>
+    </form>
+  );
+}
+```
+
+---
+
 ## Best Practices
 
 
