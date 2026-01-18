@@ -11,10 +11,16 @@ const ROUTE_LABELS: Record<string, string> = {
     '/admin/projects': 'Projects',
     '/admin/blogs': 'Blog/Insights',
     '/admin/experiences': 'Experience',
+    '/admin/education': 'Education',
+    '/admin/certifications': 'Certifications',
     '/admin/tech-stack': 'Tech Stack',
+    '/admin/stats': 'Stats',
+    '/admin/skills': 'Skills',
     '/admin/about': 'About Content',
+    '/admin/home': 'Home Content',
     '/admin/messages': 'Messages',
     '/admin/settings': 'Settings',
+    '/admin/comments': 'Comments',
 };
 
 function getPageLabel(pathname: string): string {
@@ -39,7 +45,11 @@ function getPageLabel(pathname: string): string {
     return 'Dashboard';
 }
 
-export function AdminHeader() {
+interface AdminHeaderProps {
+    onMenuClick?: () => void;
+}
+
+export function AdminHeader({ onMenuClick }: AdminHeaderProps) {
     const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -76,17 +86,30 @@ export function AdminHeader() {
     const currentPageLabel = getPageLabel(pathname);
 
     return (
-        <header className="w-full h-16 bg-background-light dark:bg-background-dark flex items-center justify-between px-8 py-4 shrink-0">
-            <div className="flex items-center text-sm text-text-muted dark:text-gray-400 font-medium">
-                <Link href="/admin/dashboard" className="hover:text-primary-dark transition-colors">Admin</Link>
-                <span className="material-symbols-outlined text-sm mx-2">
-                    chevron_right
-                </span>
-                <span className="text-text-main dark:text-white font-semibold">
-                    {currentPageLabel}
-                </span>
+        <header className="w-full h-16 bg-background-light dark:bg-background-dark flex items-center justify-between px-4 lg:px-8 py-4 shrink-0">
+            <div className="flex items-center gap-2 lg:gap-4">
+                {/* Mobile Menu Button */}
+                <button
+                    onClick={onMenuClick}
+                    className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
+                    aria-label="Open menu"
+                >
+                    <span className="material-symbols-outlined text-text-main dark:text-white">menu</span>
+                </button>
+
+                {/* Breadcrumb */}
+                <div className="flex items-center text-sm text-text-muted dark:text-gray-400 font-medium">
+                    <Link href="/admin/dashboard" className="hover:text-primary-dark transition-colors hidden sm:block">Admin</Link>
+                    <span className="material-symbols-outlined text-sm mx-2 hidden sm:block">
+                        chevron_right
+                    </span>
+                    <span className="text-text-main dark:text-white font-semibold">
+                        {currentPageLabel}
+                    </span>
+                </div>
             </div>
-            <div className="flex items-center gap-4">
+
+            <div className="flex items-center gap-2 lg:gap-4">
                 {/* Notification Bell - Placeholder */}
                 <button
                     className="p-2 text-text-muted hover:text-text-main relative cursor-pointer"
@@ -102,15 +125,15 @@ export function AdminHeader() {
                 <div className="relative" ref={dropdownRef}>
                     <button
                         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="flex items-center gap-2 hover:bg-white dark:hover:bg-white/5 px-3 py-1.5 rounded-full transition-colors cursor-pointer"
+                        className="flex items-center gap-2 hover:bg-white dark:hover:bg-white/5 px-2 lg:px-3 py-1.5 rounded-full transition-colors cursor-pointer"
                     >
                         <div className="size-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 bg-primary/20 text-primary-dark text-xs flex items-center justify-center font-bold">
                             A
                         </div>
-                        <span className="text-sm font-medium text-text-main dark:text-white hidden md:block">
+                        <span className="text-sm font-medium text-text-main dark:text-white hidden lg:block">
                             Admin
                         </span>
-                        <span className={`material-symbols-outlined text-text-muted text-sm transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}>
+                        <span className={`material-symbols-outlined text-text-muted text-sm transition-transform hidden lg:block ${isDropdownOpen ? 'rotate-180' : ''}`}>
                             expand_more
                         </span>
                     </button>

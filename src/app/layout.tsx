@@ -90,11 +90,26 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Material Symbols Outlined for icons */}
+        {/* Preconnect to Google Fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+
+        {/* Material Symbols Outlined for icons - with display=block to prevent FOUC */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block"
           rel="stylesheet"
         />
+
+        {/* Preload critical icon font */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            .material-symbols-outlined {
+              font-family: 'Material Symbols Outlined', sans-serif;
+              font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+              visibility: visible;
+            }
+          `
+        }} />
       </head>
       <body
         className={cn(

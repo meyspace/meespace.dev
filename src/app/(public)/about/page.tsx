@@ -191,10 +191,10 @@ export default async function AboutPage() {
         <div className="w-full">
             {/* Page Header */}
             <div className="mb-10 text-center md:text-left">
-                <h2 className="text-3xl md:text-5xl font-bold text-text-main dark:text-white mb-3">
+                <h2 className="text-3xl font-bold text-text-main dark:text-white tracking-tight mb-2">
                     {header.title}
                 </h2>
-                <p className="text-text-muted dark:text-gray-400 text-lg max-w-2xl">
+                <p className="text-text-muted dark:text-gray-400 max-w-2xl">
                     {header.subtitle}
                 </p>
             </div>

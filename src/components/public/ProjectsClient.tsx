@@ -43,8 +43,8 @@ export function ProjectsClient({ projects, categories }: ProjectsClientProps) {
                         <button
                             onClick={() => setActiveCategory(null)}
                             className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all cursor-pointer text-left ${activeCategory === null
-                                    ? 'bg-white dark:bg-[#2d2d2d] text-text-main dark:text-white shadow-sm font-semibold'
-                                    : 'text-text-muted hover:bg-white dark:hover:bg-gray-800 hover:text-text-main dark:hover:text-white hover:shadow-sm'
+                                ? 'bg-white dark:bg-[#2d2d2d] text-text-main dark:text-white shadow-sm font-semibold'
+                                : 'text-text-muted hover:bg-white dark:hover:bg-gray-800 hover:text-text-main dark:hover:text-white hover:shadow-sm'
                                 }`}
                         >
                             <span className="material-symbols-outlined text-lg">apps</span>
@@ -56,8 +56,8 @@ export function ProjectsClient({ projects, categories }: ProjectsClientProps) {
                                 key={idx}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-all cursor-pointer text-left ${activeCategory === cat
-                                        ? 'bg-white dark:bg-[#2d2d2d] text-text-main dark:text-white shadow-sm font-semibold'
-                                        : 'text-text-muted hover:bg-white dark:hover:bg-gray-800 hover:text-text-main dark:hover:text-white hover:shadow-sm'
+                                    ? 'bg-white dark:bg-[#2d2d2d] text-text-main dark:text-white shadow-sm font-semibold'
+                                    : 'text-text-muted hover:bg-white dark:hover:bg-gray-800 hover:text-text-main dark:hover:text-white hover:shadow-sm'
                                     }`}
                             >
                                 <span className="w-2 h-2 rounded-full bg-blue-400"></span>
@@ -109,7 +109,7 @@ export function ProjectsClient({ projects, categories }: ProjectsClientProps) {
                                             ) : (
                                                 <div className="w-full h-48 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
                                                     <span className={`material-symbols-outlined text-5xl ${project.icon_color === 'blue' ? 'text-blue-400' :
-                                                            project.icon_color === 'purple' ? 'text-purple-400' : 'text-green-400'
+                                                        project.icon_color === 'purple' ? 'text-purple-400' : 'text-green-400'
                                                         }`}>
                                                         {project.icon || 'folder'}
                                                     </span>

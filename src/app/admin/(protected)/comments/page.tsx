@@ -148,18 +148,18 @@ export default function AdminCommentsPage() {
     };
 
     const RightAction = (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
             <select
                 value={selectedPost}
                 onChange={(e) => setSelectedPost(e.target.value)}
-                className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2.5 text-sm text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="bg-white dark:bg-[#1e1e1e] border border-gray-200 dark:border-gray-700 rounded-full px-3 py-2 text-sm text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 max-w-[200px] truncate"
             >
                 <option value="all">All Posts</option>
                 {posts.map((post) => (
                     <option key={post.id} value={post.slug}>{post.title}</option>
                 ))}
             </select>
-            <span className="text-sm text-text-muted bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-full">
+            <span className="text-sm text-text-muted bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded-full whitespace-nowrap">
                 {comments.length} comment{comments.length !== 1 ? 's' : ''}
             </span>
         </div>
@@ -173,8 +173,8 @@ export default function AdminCommentsPage() {
                 rightAction={RightAction}
             />
 
-            <div className="max-w-[1400px] w-full mx-auto px-8 pb-8">
-                <div className="bento-card bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
+            <div className="max-w-[1400px] w-full mx-auto px-4 lg:px-8 pb-8">
+                <div className="bento-card bg-white dark:bg-[#1e1e1e] rounded-xl border border-gray-100 dark:border-gray-800 overflow-hidden overflow-x-auto">
                     {/* Loading State */}
                     {isLoading ? (
                         <div className="p-8">

@@ -31,7 +31,12 @@ interface SiteSettings {
     logo_url_dark?: string;
 }
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+    isOpen: boolean;
+    onClose: () => void;
+}
+
+export function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
     const router = useRouter();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -51,6 +56,12 @@ export function AdminSidebar() {
             .then(data => setSettings(data.data || {}))
             .catch(() => setSettings({}));
     }, []);
+
+    // Close sidebar on route change (mobile)
+    useEffect(() => {
+        onClose();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname]);
 
     const handleLogout = async () => {
         setIsLoggingOut(true);
@@ -72,76 +83,101 @@ export function AdminSidebar() {
         : settings?.logo_url;
 
     return (
-        <aside className="w-64 bg-white dark:bg-[#1e1e1e] border-r border-gray-200 dark:border-gray-800 flex flex-col h-full shrink-0">
-            <div className="p-6 flex items-center gap-3">
-                {logoUrl ? (
-                    <Image
-                        src={logoUrl}
-                        alt={siteName}
-                        width={32}
-                        height={32}
-                        className="h-8 w-auto object-contain"
-                    />
-                ) : (
-                    <div className="size-8 bg-primary rounded-full flex items-center justify-center text-text-main">
-                        <span className="material-symbols-outlined text-lg">
-                            data_object
-                        </span>
-                    </div>
-                )}
-                <h1 className="text-text-main dark:text-white text-lg font-bold tracking-tight">
-                    {siteName}
-                </h1>
-            </div>
+        <>
+            {/* Mobile Overlay */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+                    onClick={onClose}
+                />
+            )}
 
-            <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-                {NAV_ITEMS.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-                    return (
-                        <Link
-                            key={item.href}
-                            href={item.href}
-                            className={`flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors group ${isActive
-                                ? "bg-sage-light dark:bg-sage-green/20 text-sage-green dark:text-sage-light font-semibold"
-                                : "text-text-muted dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
-                                }`}
-                        >
-                            <span className="material-symbols-outlined">
-                                {item.icon}
+            {/* Sidebar */}
+            <aside className={`
+                fixed lg:static inset-y-0 left-0 z-50
+                w-64 bg-white dark:bg-[#1e1e1e] border-r border-gray-200 dark:border-gray-800 
+                flex flex-col h-full shrink-0
+                transform transition-transform duration-300 ease-in-out
+                ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+            `}>
+                <div className="p-6 flex items-center gap-3">
+                    {logoUrl ? (
+                        <Image
+                            src={logoUrl}
+                            alt={siteName}
+                            width={32}
+                            height={32}
+                            className="h-8 w-auto object-contain"
+                        />
+                    ) : (
+                        <div className="size-8 bg-primary rounded-full flex items-center justify-center text-text-main">
+                            <span className="material-symbols-outlined text-lg">
+                                data_object
                             </span>
-                            {item.label}
-                        </Link>
-                    );
-                })}
-            </nav>
+                        </div>
+                    )}
+                    <h1 className="text-text-main dark:text-white text-lg font-bold tracking-tight">
+                        {siteName}
+                    </h1>
 
-            <div className="p-4 border-t border-gray-100 dark:border-gray-800">
-                <div className="bg-primary/20 dark:bg-primary/10 rounded-xl p-4 flex items-center gap-3">
-                    <div className="size-8 rounded-full overflow-hidden bg-gray-200 text-xs flex items-center justify-center font-bold text-gray-500">
-                        A
-                    </div>
-                    <div className="flex flex-col overflow-hidden flex-1">
-                        <span className="text-sm font-bold text-text-main dark:text-white truncate">
-                            Admin
-                        </span>
-                        <span className="text-xs text-text-muted dark:text-gray-400 truncate">
-                            Super Admin
-                        </span>
-                    </div>
+                    {/* Close button - mobile only */}
                     <button
-                        onClick={handleLogout}
-                        disabled={isLoggingOut}
-                        className="ml-auto text-text-muted hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
-                        title="Sign out"
+                        onClick={onClose}
+                        className="lg:hidden ml-auto p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer"
                     >
-                        {isLoggingOut ? (
-                            <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
-                        ) : (
-                            <span className="material-symbols-outlined text-lg">logout</span>
-                        )}
+                        <span className="material-symbols-outlined text-text-muted">close</span>
                     </button>
                 </div>
-            </div>
-        </aside>
+
+                <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+                    {NAV_ITEMS.map((item) => {
+                        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                        return (
+                            <Link
+                                key={item.href}
+                                href={item.href}
+                                className={`flex items-center gap-3 px-4 py-3 font-medium rounded-xl transition-colors group ${isActive
+                                    ? "bg-sage-light dark:bg-sage-green/20 text-sage-green dark:text-sage-light font-semibold"
+                                    : "text-text-muted dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-main dark:hover:text-white"
+                                    }`}
+                            >
+                                <span className="material-symbols-outlined">
+                                    {item.icon}
+                                </span>
+                                {item.label}
+                            </Link>
+                        );
+                    })}
+                </nav>
+
+                <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+                    <div className="bg-primary/20 dark:bg-primary/10 rounded-xl p-4 flex items-center gap-3">
+                        <div className="size-8 rounded-full overflow-hidden bg-gray-200 text-xs flex items-center justify-center font-bold text-gray-500">
+                            A
+                        </div>
+                        <div className="flex flex-col overflow-hidden flex-1">
+                            <span className="text-sm font-bold text-text-main dark:text-white truncate">
+                                Admin
+                            </span>
+                            <span className="text-xs text-text-muted dark:text-gray-400 truncate">
+                                Super Admin
+                            </span>
+                        </div>
+                        <button
+                            onClick={handleLogout}
+                            disabled={isLoggingOut}
+                            className="ml-auto text-text-muted hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
+                            title="Sign out"
+                        >
+                            {isLoggingOut ? (
+                                <span className="material-symbols-outlined text-lg animate-spin">progress_activity</span>
+                            ) : (
+                                <span className="material-symbols-outlined text-lg">logout</span>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </aside>
+        </>
     );
 }

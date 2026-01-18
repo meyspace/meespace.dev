@@ -94,7 +94,7 @@ export function TechMarquee({ tools }: TechMarqueeProps) {
                                     alt={tool.name}
                                     width={32}
                                     height={32}
-                                    className="w-8 h-8 object-contain"
+                                    className="w-8 h-8 object-contain dark:invert dark:brightness-200"
                                 />
                             ) : (
                                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-text-main dark:text-white">

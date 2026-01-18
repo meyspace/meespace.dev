@@ -51,7 +51,7 @@ export default async function InsightsPage() {
         <div className="flex flex-col gap-10">
             {/* Header */}
             <div className="text-center md:text-left">
-                <h2 className="text-4xl font-bold text-text-main dark:text-white tracking-tight mb-3">
+                <h2 className="text-3xl font-bold text-text-main dark:text-white tracking-tight mb-2">
                     Insights & Blog
                 </h2>
                 <p className="text-text-muted dark:text-gray-400 max-w-2xl">

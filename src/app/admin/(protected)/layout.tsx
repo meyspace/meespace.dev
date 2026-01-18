@@ -1,5 +1,4 @@
-import { AdminSidebar } from "@/components/admin/ui/AdminSidebar";
-import { AdminHeader } from "@/components/admin/ui/AdminHeader";
+import { AdminLayoutClient } from "@/components/admin/ui/AdminLayoutClient";
 import { ToastProvider } from "@/components/shared/Toast";
 import { requireAdmin } from "@/lib/auth";
 
@@ -13,15 +12,9 @@ export default async function AdminProtectedLayout({
 
     return (
         <ToastProvider>
-            <div className="flex h-screen bg-background-light dark:bg-background-dark overflow-hidden">
-                <AdminSidebar />
-                <main className="flex-1 flex flex-col h-full overflow-hidden relative">
-                    <AdminHeader />
-                    <div className="flex-1 overflow-y-auto pb-8">
-                        {children}
-                    </div>
-                </main>
-            </div>
+            <AdminLayoutClient>
+                {children}
+            </AdminLayoutClient>
         </ToastProvider>
     );
 }
