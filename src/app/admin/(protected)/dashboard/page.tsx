@@ -27,10 +27,10 @@ export default function AdminDashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const { showToast } = useToast();
 
-    // Fetch dashboard data from stats API
+    // Fetch dashboard data from dashboard API (aggregates counts)
     const fetchData = useCallback(async () => {
         setIsLoading(true);
-        const result = await apiCall<DashboardData>('/api/v1/stats');
+        const result = await apiCall<DashboardData>('/api/v1/dashboard');
 
         if (result.success && result.data) {
             setData(result.data);

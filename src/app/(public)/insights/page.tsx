@@ -8,11 +8,12 @@ interface BlogPost {
     excerpt: string;
     slug: string;
     status: string;
-    reading_time?: number;
+    read_time_minutes?: number;
     published_at?: string;
     created_at: string;
-    category?: { name: string };
-    author?: { full_name: string };
+    category?: { id: string; name: string };
+    author_name?: string;
+    featured_image_url?: string;
 }
 
 async function getBlogPosts(): Promise<BlogPost[]> {
@@ -75,14 +76,24 @@ export default async function InsightsPage() {
                                     </span>
                                 </div>
                                 <div className="h-64 overflow-hidden relative bg-gray-100 dark:bg-gray-800">
-                                    <div className="absolute inset-0 bg-primary/20 dark:bg-primary/10"></div>
-                                    <div className="absolute -right-10 -top-10 w-48 h-48 bg-purple-200 dark:bg-purple-900/30 rounded-full blur-3xl"></div>
-                                    <div className="absolute -left-10 bottom-0 w-64 h-64 bg-primary rounded-full blur-3xl opacity-40"></div>
-                                    <div className="w-full h-full flex items-center justify-center relative z-0">
-                                        <span className="material-symbols-outlined text-6xl text-text-muted/20 dark:text-white/10 scale-150 transform group-hover:scale-125 transition-transform duration-700">
-                                            article
-                                        </span>
-                                    </div>
+                                    {latestPost.featured_image_url ? (
+                                        <img
+                                            src={latestPost.featured_image_url}
+                                            alt={latestPost.title}
+                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                        />
+                                    ) : (
+                                        <>
+                                            <div className="absolute inset-0 bg-primary/20 dark:bg-primary/10"></div>
+                                            <div className="absolute -right-10 -top-10 w-48 h-48 bg-purple-200 dark:bg-purple-900/30 rounded-full blur-3xl"></div>
+                                            <div className="absolute -left-10 bottom-0 w-64 h-64 bg-primary rounded-full blur-3xl opacity-40"></div>
+                                            <div className="w-full h-full flex items-center justify-center relative z-0">
+                                                <span className="material-symbols-outlined text-6xl text-text-muted/20 dark:text-white/10 scale-150 transform group-hover:scale-125 transition-transform duration-700">
+                                                    article
+                                                </span>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <div className="p-8 flex flex-col flex-grow">
                                     <div className="flex gap-2 mb-4">
@@ -90,7 +101,7 @@ export default async function InsightsPage() {
                                             {latestPost.category?.name || 'General'}
                                         </span>
                                         <span className="px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs font-medium">
-                                            {latestPost.reading_time || 5} min read
+                                            {latestPost.read_time_minutes || 5} min read
                                         </span>
                                     </div>
                                     <h3 className="text-2xl font-bold text-text-main dark:text-white mb-3 group-hover:text-primary-dark transition-colors">
@@ -101,13 +112,11 @@ export default async function InsightsPage() {
                                     </p>
                                     <div className="mt-auto flex items-center justify-between">
                                         <div className="flex items-center gap-2">
-                                            <div className="size-8 rounded-full bg-gray-200 overflow-hidden relative">
-                                                <div className="w-full h-full bg-gray-300 flex items-center justify-center text-xs">
-                                                    {latestPost.author?.full_name?.charAt(0) || 'A'}
-                                                </div>
+                                            <div className="size-8 rounded-full bg-gray-200 overflow-hidden relative flex items-center justify-center text-xs font-bold text-gray-600">
+                                                {latestPost.author_name?.charAt(0) || 'A'}
                                             </div>
                                             <span className="text-xs font-medium text-text-main dark:text-gray-300">
-                                                {latestPost.author?.full_name || 'Author'}
+                                                {latestPost.author_name || 'Author'}
                                             </span>
                                         </div>
                                         <span className="text-xs text-text-muted dark:text-gray-500">

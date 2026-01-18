@@ -158,8 +158,8 @@ export function CertificationModal({ isOpen, onClose, onSuccess, editData }: Cer
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6">
+                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                        <div className="p-8 overflow-y-auto flex-1 min-h-0 custom-scrollbar space-y-6">
 
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="col-span-2">
@@ -245,20 +245,32 @@ export function CertificationModal({ isOpen, onClose, onSuccess, editData }: Cer
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-semibold text-text-main dark:text-gray-300 mb-2">Icon</label>
+                                    <label className="block text-sm font-semibold text-text-main dark:text-gray-300 mb-2">
+                                        Icon
+                                        {formData.icon && (
+                                            <span className="ml-2 text-sage-green font-normal">
+                                                (<span className="material-symbols-outlined text-sm align-middle">{formData.icon}</span> {formData.icon})
+                                            </span>
+                                        )}
+                                    </label>
                                     <div className="flex gap-1.5 flex-wrap">
                                         {iconOptions.map(icon => (
                                             <button
                                                 key={icon}
                                                 type="button"
                                                 onClick={() => setFormData({ ...formData, icon })}
-                                                className={`p-2 rounded-lg border transition-colors cursor-pointer ${formData.icon === icon
-                                                    ? 'border-sage-green bg-sage-light dark:bg-sage-green/20'
-                                                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-white/10'
+                                                className={`p-2.5 rounded-lg border-2 transition-all cursor-pointer relative ${formData.icon === icon
+                                                    ? 'border-sage-green bg-sage-green/20 text-sage-green ring-2 ring-sage-green/30'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-white/10 text-text-muted'
                                                     }`}
                                                 title={icon}
                                             >
-                                                <span className="material-symbols-outlined text-sm">{icon}</span>
+                                                <span className="material-symbols-outlined text-lg">{icon}</span>
+                                                {formData.icon === icon && (
+                                                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-sage-green rounded-full flex items-center justify-center">
+                                                        <span className="material-symbols-outlined text-white text-[10px]">check</span>
+                                                    </span>
+                                                )}
                                             </button>
                                         ))}
                                     </div>

@@ -32,7 +32,14 @@ export async function GET(request: NextRequest) {
                 return errorResponse(error.message, 400, rateLimitInfo);
             }
 
-            return successResponse({ education: data }, 200, rateLimitInfo);
+            // Map 'institution' to 'school' in response for frontend compatibility
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const mappedData = data?.map((item: any) => ({
+                ...item,
+                school: item.institution || item.school,
+            }));
+
+            return successResponse({ education: mappedData }, 200, rateLimitInfo);
         } catch (err) {
             console.error('Error fetching education:', err);
             return errorResponse('Internal server error', 500, rateLimitInfo);
@@ -52,6 +59,12 @@ export async function POST(request: NextRequest) {
                 const supabase = await createClient();
                 const body = await req.json();
 
+                // Map 'school' to 'institution' for database compatibility
+                if (body.school && !body.institution) {
+                    body.institution = body.school;
+                    delete body.school;
+                }
+
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data, error } = await (supabase as any)
                     .from('education')
@@ -61,6 +74,11 @@ export async function POST(request: NextRequest) {
 
                 if (error) {
                     return errorResponse(error.message, 400, rateLimitInfo);
+                }
+
+                // Map 'institution' back to 'school' in response for frontend
+                if (data && data.institution) {
+                    data.school = data.institution;
                 }
 
                 return successResponse(data, 201, rateLimitInfo);
@@ -92,6 +110,12 @@ export async function PUT(request: NextRequest) {
 
                 const body = await req.json();
 
+                // Map 'school' to 'institution' for database compatibility
+                if (body.school && !body.institution) {
+                    body.institution = body.school;
+                    delete body.school;
+                }
+
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const { data, error } = await (supabase as any)
                     .from('education')
@@ -102,6 +126,11 @@ export async function PUT(request: NextRequest) {
 
                 if (error) {
                     return errorResponse(error.message, 400, rateLimitInfo);
+                }
+
+                // Map 'institution' back to 'school' in response for frontend
+                if (data && data.institution) {
+                    data.school = data.institution;
                 }
 
                 return successResponse(data, 200, rateLimitInfo);

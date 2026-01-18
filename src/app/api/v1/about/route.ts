@@ -103,6 +103,32 @@ export async function PUT(request: NextRequest) {
 
                 const body = await req.json();
 
+                // Map the content object to database columns based on section type
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const dbData: Record<string, any> = {
+                    section_key: sectionKey,
+                    is_active: body.is_active ?? true,
+                };
+
+                // Handle different section types
+                if (sectionKey === 'header') {
+                    dbData.title = body.content?.title || body.title || '';
+                    dbData.subtitle = body.content?.subtitle || body.subtitle || '';
+                } else if (sectionKey === 'story') {
+                    dbData.title = body.content?.title || body.title || '';
+                    dbData.story_tag = body.content?.tag || '';
+                    dbData.story_year = body.content?.year || '';
+                    dbData.image_url = body.content?.image || '';
+                    // Store paragraphs array as JSON string in content field
+                    dbData.content = JSON.stringify(body.content?.content || []);
+                } else if (sectionKey === 'funFact') {
+                    dbData.title = body.content?.title || body.title || '';
+                    dbData.content = body.content?.description || '';
+                } else if (sectionKey === 'offline') {
+                    dbData.title = body.content?.title || body.title || '';
+                    dbData.content = body.content?.description || '';
+                }
+
                 // Check if section exists
                 const { data: existing } = await supabase
                     .from('about_content')
@@ -110,35 +136,39 @@ export async function PUT(request: NextRequest) {
                     .eq('section_key', sectionKey)
                     .single();
 
+                let result;
                 if (!existing) {
                     // Create if doesn't exist
-                    const { data, error } = await supabase
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const { data, error } = await (supabase as any)
                         .from('about_content')
-                        .insert({ ...body, section_key: sectionKey })
+                        .insert(dbData)
                         .select()
                         .single();
 
                     if (error) {
+                        console.error('Insert error:', error);
                         return errorResponse(error.message, 400, rateLimitInfo);
                     }
+                    result = data;
+                } else {
+                    // Update existing
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const { data, error } = await (supabase as any)
+                        .from('about_content')
+                        .update(dbData)
+                        .eq('section_key', sectionKey)
+                        .select()
+                        .single();
 
-                    return successResponse(data, 201, rateLimitInfo);
+                    if (error) {
+                        console.error('Update error:', error);
+                        return errorResponse(error.message, 400, rateLimitInfo);
+                    }
+                    result = data;
                 }
 
-                // Update existing
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data, error } = await (supabase as any)
-                    .from('about_content')
-                    .update(body)
-                    .eq('section_key', sectionKey)
-                    .select()
-                    .single();
-
-                if (error) {
-                    return errorResponse(error.message, 400, rateLimitInfo);
-                }
-
-                return successResponse(data, 200, rateLimitInfo);
+                return successResponse(result, existing ? 200 : 201, rateLimitInfo);
             } catch (err) {
                 console.error('Error updating about content:', err);
                 return errorResponse('Internal server error', 500, rateLimitInfo);

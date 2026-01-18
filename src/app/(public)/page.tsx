@@ -1,4 +1,5 @@
 import { BentoCard } from "@/components/public/BentoCard";
+import { ContactForm } from "@/components/public/ContactForm";
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
@@ -8,7 +9,6 @@ import {
   Linkedin,
   Mail,
   MapPin,
-  Send,
 } from "lucide-react";
 
 // API fetch functions for server-side rendering
@@ -343,26 +343,7 @@ export default async function Home() {
                 </div>
               </div>
 
-              <div className="bg-white/80 dark:bg-[#1e1e1e]/80 backdrop-blur-sm rounded-xl p-6 shadow-sm border border-white/50 dark:border-white/10">
-                <form className="flex flex-col gap-4">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-text-main dark:text-gray-300 mb-1">Name</label>
-                    <input type="text" id="name" placeholder="John Doe" className="w-full rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-text-main dark:text-white focus:ring-primary focus:border-primary py-2.5 px-3 shadow-sm outline-none focus:ring-2 transition-shadow" />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-text-main dark:text-gray-300 mb-1">Email</label>
-                    <input type="email" id="email" placeholder="john@company.com" className="w-full rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-text-main dark:text-white focus:ring-primary focus:border-primary py-2.5 px-3 shadow-sm outline-none focus:ring-2 transition-shadow" />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-text-main dark:text-gray-300 mb-1">Message</label>
-                    <textarea id="message" rows={4} placeholder="Tell me about your project..." className="w-full rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-text-main dark:text-white focus:ring-primary focus:border-primary py-2.5 px-3 shadow-sm outline-none focus:ring-2 transition-shadow"></textarea>
-                  </div>
-                  <button type="button" className="mt-2 w-full bg-text-main dark:bg-white text-white dark:text-text-main font-bold py-3 rounded-lg hover:opacity-90 transition-opacity shadow-md flex items-center justify-center gap-2">
-                    <Send className="w-4 h-4" />
-                    <span>Send Message</span>
-                  </button>
-                </form>
-              </div>
+              <ContactForm />
             </div>
           </div>
         </div>

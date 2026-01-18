@@ -22,6 +22,22 @@ export async function GET(request: NextRequest) {
             const featured = url.searchParams.get('featured') === 'true';
             const limit = parseInt(url.searchParams.get('limit') || '50', 10);
             const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+            const fetchCategories = url.searchParams.get('categories') === 'true';
+
+            // If only categories are requested, return just the categories
+            if (fetchCategories) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: categoriesData, error: catError } = await (supabase as any)
+                    .from('blog_categories')
+                    .select('*')
+                    .order('name');
+
+                if (catError) {
+                    return errorResponse(catError.message, 400, rateLimitInfo);
+                }
+
+                return successResponse({ categories: categoriesData || [] }, 200, rateLimitInfo);
+            }
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let query = (supabase as any)

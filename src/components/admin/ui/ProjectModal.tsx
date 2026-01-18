@@ -105,7 +105,30 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
                     problem_statement: editData.problem_statement || '',
                     solution_description: editData.solution_description || '',
                 });
-                // TODO: Fetch deliverables, outcomes, images for this project
+
+                // Fetch deliverables, outcomes, images for this project
+                if (editData.id) {
+                    const fetchProjectDetails = async () => {
+                        const result = await apiCall(`/api/v1/projects/${editData.slug}?admin=true`);
+                        if (result.success && result.data) {
+                            const projectData = result.data as {
+                                deliverables?: Deliverable[];
+                                outcomes?: Outcome[];
+                                images?: { image_url: string }[];
+                            };
+                            if (projectData.deliverables) {
+                                setDeliverables(projectData.deliverables);
+                            }
+                            if (projectData.outcomes) {
+                                setOutcomes(projectData.outcomes);
+                            }
+                            if (projectData.images) {
+                                setProjectImages(projectData.images.map(img => img.image_url));
+                            }
+                        }
+                    };
+                    fetchProjectDetails();
+                }
             } else {
                 setFormData({
                     title: '',
@@ -203,7 +226,8 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
 
         let result;
         if (editData?.id) {
-            result = await apiCall(`/api/v1/projects?id=${editData.id}`, { method: 'PUT', body: payload });
+            // Use slug-based endpoint for updating
+            result = await apiCall(`/api/v1/projects/${editData.slug}`, { method: 'PUT', body: payload });
         } else {
             result = await apiCall('/api/v1/projects', { method: 'POST', body: payload });
         }
@@ -258,8 +282,8 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
                                 type="button"
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap cursor-pointer ${activeTab === tab.id
-                                        ? 'bg-sage-green/20 text-sage-green'
-                                        : 'text-text-muted hover:bg-gray-100 dark:hover:bg-white/5'
+                                    ? 'bg-sage-green/20 text-sage-green'
+                                    : 'text-text-muted hover:bg-gray-100 dark:hover:bg-white/5'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-sm">{tab.icon}</span>
@@ -268,8 +292,8 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1 min-h-0">
 
                             {/* TAB: Basic Info */}
                             {activeTab === 'basic' && (

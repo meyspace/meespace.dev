@@ -10,8 +10,12 @@ const NAV_ITEMS = [
     { label: "Overview", icon: "dashboard", href: "/admin/dashboard" },
     { label: "Projects", icon: "folder_open", href: "/admin/projects" },
     { label: "Blog/Insights", icon: "article", href: "/admin/blogs" },
+    { label: "Comments", icon: "chat_bubble", href: "/admin/comments" },
     { label: "Experience", icon: "work_history", href: "/admin/experiences" },
     { label: "Tech Stack", icon: "memory", href: "/admin/tech-stack" },
+    { label: "About Content", icon: "person", href: "/admin/about" },
+    { label: "Home Content", icon: "home", href: "/admin/home" },
+    { label: "Messages", icon: "mail", href: "/admin/messages" },
     { label: "Settings", icon: "settings", href: "/admin/settings" },
 ];
 

@@ -1,21 +1,29 @@
 import { BentoCard } from "@/components/public/BentoCard";
+import { ImageCarousel } from "@/components/public/ImageCarousel";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 interface Project {
     id: string;
     title: string;
-    subtitle: string;
-    description?: string;
+    short_description?: string;
+    full_description?: string;
     slug: string;
-    category: string;
-    icon: string;
-    icon_color: string;
+    category?: string;
+    icon?: string;
+    icon_color?: string;
     status: string;
+    year?: string;
     tech_stack?: string[];
-    problem?: string;
-    solution?: string;
+    problem_statement?: string;
+    solution_description?: string;
+    featured_image_url?: string;
+    thumbnail_url?: string;
+    gallery_images?: { url: string; alt?: string; caption?: string }[];
     outcomes?: { value: string; label: string }[];
     deliverables?: { title: string; description: string; icon: string }[];
 }
@@ -42,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     return {
         title: `${project.title} - Case Study`,
-        description: project.subtitle,
+        description: project.short_description,
     };
 }
 
@@ -74,12 +82,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                             <span className="material-symbols-outlined text-xl">{project.icon || 'folder'}</span>
                         </div>
                         <span className="text-sm font-bold text-text-muted tracking-wide uppercase">{project.category}</span>
+                        {project.year && (
+                            <span className="text-sm text-text-muted">• {project.year}</span>
+                        )}
                     </div>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text-main dark:text-white leading-tight tracking-tight">
                         {project.title}
                     </h1>
                     <p className="text-lg md:text-xl text-text-muted dark:text-gray-400 max-w-3xl leading-relaxed">
-                        {project.subtitle}
+                        {project.short_description}
                     </p>
                     {project.tech_stack && project.tech_stack.length > 0 && (
                         <div className="flex flex-wrap gap-2">
@@ -90,14 +101,35 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                             ))}
                         </div>
                     )}
+                    {/* Featured Image */}
+                    {project.featured_image_url && (
+                        <div className="mt-6 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <img
+                                src={project.featured_image_url}
+                                alt={project.title}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+                    )}
+
+                    {/* Gallery Carousel */}
+                    {project.gallery_images && project.gallery_images.length > 0 && (
+                        <div className="mt-8">
+                            <h3 className="text-lg font-bold text-text-main dark:text-white mb-4 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary-dark">photo_library</span>
+                                Project Gallery
+                            </h3>
+                            <ImageCarousel images={project.gallery_images} />
+                        </div>
+                    )}
                 </header>
 
                 <hr className="border-gray-200 dark:border-gray-800" />
 
                 {/* Problem & Solution */}
-                {(project.problem || project.solution) && (
+                {(project.problem_statement || project.solution_description) && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {project.problem && (
+                        {project.problem_statement && (
                             <BentoCard className="rounded-3xl p-8 h-full bg-white dark:bg-[#1e1e1e] border-gray-100 dark:border-gray-800">
                                 <h3 className="text-xl font-bold text-text-main dark:text-white flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg text-red-500">
@@ -105,10 +137,14 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                                     </div>
                                     The Problem
                                 </h3>
-                                <p className="text-text-muted dark:text-gray-400 leading-relaxed text-base">{project.problem}</p>
+                                <div className="prose dark:prose-invert prose-sm max-w-none text-text-muted dark:text-gray-400">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                        {project.problem_statement}
+                                    </ReactMarkdown>
+                                </div>
                             </BentoCard>
                         )}
-                        {project.solution && (
+                        {project.solution_description && (
                             <BentoCard className="rounded-3xl p-8 h-full bg-white dark:bg-[#1e1e1e] border-gray-100 dark:border-gray-800">
                                 <h3 className="text-xl font-bold text-text-main dark:text-white flex items-center gap-3 mb-4">
                                     <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg text-green-600 dark:text-green-500">
@@ -116,20 +152,28 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                                     </div>
                                     The Solution
                                 </h3>
-                                <p className="text-text-muted dark:text-gray-400 leading-relaxed text-base">{project.solution}</p>
+                                <div className="prose dark:prose-invert prose-sm max-w-none text-text-muted dark:text-gray-400">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                        {project.solution_description}
+                                    </ReactMarkdown>
+                                </div>
                             </BentoCard>
                         )}
                     </div>
                 )}
 
                 {/* Description */}
-                {project.description && (
+                {project.full_description && (
                     <section className="bg-gray-50 dark:bg-gray-900/50 rounded-3xl p-8 md:p-10 border border-gray-200 dark:border-gray-800">
                         <h3 className="text-2xl font-bold text-text-main dark:text-white flex items-center gap-3 mb-6">
                             <span className="material-symbols-outlined text-blue-500 text-3xl">description</span>
                             Overview
                         </h3>
-                        <p className="text-text-muted dark:text-gray-400 leading-relaxed text-base whitespace-pre-line">{project.description}</p>
+                        <div className="prose dark:prose-invert max-w-none text-text-muted dark:text-gray-400">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                                {project.full_description}
+                            </ReactMarkdown>
+                        </div>
                     </section>
                 )}
 

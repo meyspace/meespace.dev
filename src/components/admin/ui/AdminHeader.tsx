@@ -2,10 +2,45 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createBrowserClient } from '@supabase/ssr';
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
+// Map routes to display names for dynamic breadcrumbs
+const ROUTE_LABELS: Record<string, string> = {
+    '/admin/dashboard': 'Dashboard',
+    '/admin/projects': 'Projects',
+    '/admin/blogs': 'Blog/Insights',
+    '/admin/experiences': 'Experience',
+    '/admin/tech-stack': 'Tech Stack',
+    '/admin/about': 'About Content',
+    '/admin/messages': 'Messages',
+    '/admin/settings': 'Settings',
+};
+
+function getPageLabel(pathname: string): string {
+    // Direct match
+    if (ROUTE_LABELS[pathname]) {
+        return ROUTE_LABELS[pathname];
+    }
+    // Check for partial matches (e.g., /admin/projects/new)
+    for (const [route, label] of Object.entries(ROUTE_LABELS)) {
+        if (pathname.startsWith(route + '/')) {
+            return label;
+        }
+    }
+    // Fallback: extract from path
+    const segments = pathname.split('/').filter(Boolean);
+    if (segments.length >= 2) {
+        return segments[segments.length - 1]
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+    return 'Dashboard';
+}
+
 export function AdminHeader() {
+    const pathname = usePathname();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,6 +73,8 @@ export function AdminHeader() {
         }
     };
 
+    const currentPageLabel = getPageLabel(pathname);
+
     return (
         <header className="w-full h-16 bg-background-light dark:bg-background-dark flex items-center justify-between px-8 py-4 shrink-0">
             <div className="flex items-center text-sm text-text-muted dark:text-gray-400 font-medium">
@@ -46,7 +83,7 @@ export function AdminHeader() {
                     chevron_right
                 </span>
                 <span className="text-text-main dark:text-white font-semibold">
-                    Dashboard
+                    {currentPageLabel}
                 </span>
             </div>
             <div className="flex items-center gap-4">

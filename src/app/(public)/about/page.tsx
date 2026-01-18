@@ -6,30 +6,42 @@ interface Experience {
     title: string;
     company: string;
     location?: string;
+    employment_type?: string;
     start_date: string;
     end_date?: string;
     is_current: boolean;
     description?: string;
+    highlights?: string[];
+    tags?: string[];
+    color?: string;
 }
 
 interface Education {
     id: string;
     degree: string;
-    institution: string;
+    institution?: string;
+    school?: string;
     field_of_study?: string;
     start_year: number;
     end_year?: number;
     gpa?: string;
+    description?: string;
+    achievements?: string[];
 }
 
 interface Certification {
     id: string;
     name: string;
+    short_name?: string;
+    subtitle?: string;
     issuer: string;
     issue_date: string;
     expiry_date?: string;
+    credential_id?: string;
     credential_url?: string;
     certificate_file_url?: string;
+    icon?: string;
+    is_expired?: boolean;
 }
 
 interface AboutContent {
@@ -86,18 +98,51 @@ function formatDateRange(startDate: string, endDate?: string, isCurrent?: boolea
 export default async function AboutPage() {
     const { about, experiences, education, certifications } = await fetchData();
 
-    // Extract about sections
+    // Extract about sections - data comes as flat columns from DB, not content object
     const sections = about.sections || {};
-    const header = sections.header?.content || { title: "About Me", subtitle: "My journey and experiences" };
-    const story = sections.story?.content || {
-        title: "My Story",
-        content: ["Add your story in the admin panel."],
-        image: "/placeholder-avatar.png",
-        tag: "Background",
-        year: "Present"
+
+    // Header section
+    const headerData = sections.header || {};
+    const header = {
+        title: headerData.title || "About Me",
+        subtitle: headerData.subtitle || "My journey and experiences"
     };
-    const funFact = sections.funFact?.content || { title: "Fun Fact", description: "Add a fun fact in the admin panel." };
-    const offline = sections.offline?.content || { title: "When Offline", description: "Add your hobbies in the admin panel." };
+
+    // Story section - parse content as JSON string of paragraphs
+    const storyData = sections.story || {};
+    let storyParagraphs = ["Add your story in the admin panel."];
+    try {
+        if (storyData.content) {
+            const parsed = JSON.parse(storyData.content);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                storyParagraphs = parsed;
+            }
+        }
+    } catch {
+        // If content is not JSON, treat as single paragraph
+        if (storyData.content) storyParagraphs = [storyData.content];
+    }
+    const story = {
+        title: storyData.title || "My Story",
+        content: storyParagraphs,
+        image: storyData.image_url || "",
+        tag: storyData.story_tag || "Background",
+        year: storyData.story_year || "Present"
+    };
+
+    // Fun Fact section
+    const funFactData = sections.funFact || {};
+    const funFact = {
+        title: funFactData.title || "Fun Fact",
+        description: funFactData.content || "Add a fun fact in the admin panel."
+    };
+
+    // Offline section
+    const offlineData = sections.offline || {};
+    const offline = {
+        title: offlineData.title || "When Offline",
+        description: offlineData.content || "Add your hobbies in the admin panel."
+    };
 
     // Get first education as primary degree
     const primaryEducation = education.length > 0 ? education[0] : null;
@@ -174,13 +219,31 @@ export default async function AboutPage() {
                                     {education.map((edu: Education) => (
                                         <div key={edu.id} className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
                                             <h4 className="font-bold text-text-main dark:text-white text-sm">{edu.degree}</h4>
-                                            <p className="text-xs text-text-muted dark:text-gray-400 mt-1">{edu.institution}</p>
+                                            <p className="text-xs text-text-muted dark:text-gray-400 mt-1">
+                                                {edu.school || edu.institution}
+                                            </p>
                                             {edu.field_of_study && (
                                                 <p className="text-xs text-text-muted dark:text-gray-400">{edu.field_of_study}</p>
                                             )}
-                                            <p className="text-xs text-text-muted dark:text-gray-500 mt-0.5">
-                                                {edu.start_year} - {edu.end_year || 'Present'}
-                                            </p>
+                                            <div className="flex items-center gap-2 mt-1">
+                                                <span className="text-xs text-text-muted dark:text-gray-500">
+                                                    {edu.start_year} - {edu.end_year || 'Present'}
+                                                </span>
+                                                {edu.gpa && (
+                                                    <span className="text-xs px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded">
+                                                        GPA: {edu.gpa}
+                                                    </span>
+                                                )}
+                                            </div>
+                                            {edu.achievements && edu.achievements.length > 0 && (
+                                                <ul className="mt-2 space-y-1">
+                                                    {edu.achievements.map((ach: string, aIdx: number) => (
+                                                        <li key={aIdx} className="text-xs text-text-muted dark:text-gray-400 flex items-start gap-1">
+                                                            <span className="text-primary-dark">•</span> {ach}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -195,24 +258,53 @@ export default async function AboutPage() {
                                     {certifications.map((cert: Certification) => (
                                         <div key={cert.id} className="flex items-start gap-3 p-3 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-primary/50 transition-colors">
                                             <div className="mt-0.5 text-blue-600 dark:text-blue-400">
-                                                <span className="material-symbols-outlined text-[20px]">verified</span>
+                                                <span className="material-symbols-outlined text-[20px]">
+                                                    {cert.icon || 'verified'}
+                                                </span>
                                             </div>
                                             <div className="flex-1">
-                                                <h4 className="font-bold text-text-main dark:text-white text-sm">{cert.name}</h4>
-                                                <p className="text-xs text-text-muted dark:text-gray-400">{cert.issuer}</p>
-                                                <p className="text-xs text-text-muted dark:text-gray-500 mt-0.5">
-                                                    {new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                                </p>
-                                                {cert.credential_url && (
-                                                    <a
-                                                        href={cert.credential_url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="text-xs text-sage-green hover:underline mt-1 inline-block"
-                                                    >
-                                                        View Credential →
-                                                    </a>
+                                                <h4 className="font-bold text-text-main dark:text-white text-sm">
+                                                    {cert.name}
+                                                    {cert.short_name && (
+                                                        <span className="ml-2 text-xs text-text-muted font-normal">({cert.short_name})</span>
+                                                    )}
+                                                </h4>
+                                                {cert.subtitle && (
+                                                    <p className="text-xs text-text-muted dark:text-gray-400">{cert.subtitle}</p>
                                                 )}
+                                                <p className="text-xs text-text-muted dark:text-gray-400">{cert.issuer}</p>
+                                                <div className="flex items-center gap-2 mt-1">
+                                                    <span className="text-xs text-text-muted dark:text-gray-500">
+                                                        {new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                                                    </span>
+                                                    {cert.is_expired && (
+                                                        <span className="text-xs px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded">Expired</span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-wrap gap-2 mt-2">
+                                                    {cert.credential_url && (
+                                                        <a
+                                                            href={cert.credential_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-xs text-sage-green hover:underline flex items-center gap-1"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
+                                                            View Credential
+                                                        </a>
+                                                    )}
+                                                    {cert.certificate_file_url && (
+                                                        <a
+                                                            href={cert.certificate_file_url}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">description</span>
+                                                            View Certificate
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -245,8 +337,13 @@ export default async function AboutPage() {
                                 <div key={exp.id} className="relative pl-8">
                                     <div className={`absolute -left-[9px] top-1.5 w-5 h-5 rounded-full border-4 border-white dark:border-[#1e1e1e] shadow-sm z-10 ${idx === 0 ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"}`}></div>
                                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-2 flex-wrap">
                                             <h4 className="text-lg font-bold text-text-main dark:text-white">{exp.title}</h4>
+                                            {exp.employment_type && (
+                                                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                                                    {exp.employment_type}
+                                                </span>
+                                            )}
                                             {exp.is_current && (
                                                 <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
                                                     Current
@@ -262,9 +359,28 @@ export default async function AboutPage() {
                                         {exp.location && <span className="text-text-muted/70"> · {exp.location}</span>}
                                     </p>
                                     {exp.description && (
-                                        <p className="text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                        <p className="text-sm text-text-muted dark:text-gray-400 leading-relaxed mb-3">
                                             {exp.description}
                                         </p>
+                                    )}
+                                    {exp.highlights && exp.highlights.length > 0 && (
+                                        <ul className="text-sm text-text-muted dark:text-gray-400 space-y-1 mb-3">
+                                            {exp.highlights.map((highlight: string, hIdx: number) => (
+                                                <li key={hIdx} className="flex items-start gap-2">
+                                                    <span className="text-primary-dark mt-1">•</span>
+                                                    <span>{highlight}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                    {exp.tags && exp.tags.length > 0 && (
+                                        <div className="flex flex-wrap gap-1.5">
+                                            {exp.tags.map((tag: string, tIdx: number) => (
+                                                <span key={tIdx} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs font-medium text-text-muted">
+                                                    {tag}
+                                                </span>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             ))}

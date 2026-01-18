@@ -43,7 +43,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
                 .order('created_at', { ascending: true });
 
             if (!isAdmin) {
-                query = query.eq('is_approved', true);
+                // Show all comments (no approval needed)
             }
 
             const { data: comments, error } = await query;
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
                 content: body.content,
                 parent_comment_id: body.parent_comment_id || null,
                 depth,
-                is_approved: false, // Comments need approval by default
+                is_approved: true, // Auto-approve comments
             };
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,6 +143,44 @@ export async function POST(request: NextRequest, context: RouteContext) {
             return errorResponse('Internal server error', 500, rateLimitInfo);
         }
     });
+}
+
+/**
+ * DELETE /api/v1/blog/[slug]/comments?id=<comment_id>
+ * Delete a comment (admin only)
+ */
+export async function DELETE(request: NextRequest, context: RouteContext) {
+    return withApiMiddleware(
+        request,
+        async (req, rateLimitInfo) => {
+            try {
+                const supabase = await createClient();
+                const url = new URL(req.url);
+                const commentId = url.searchParams.get('id');
+
+                if (!commentId) {
+                    return errorResponse('Comment ID is required', 400, rateLimitInfo);
+                }
+
+                // Delete comment and all its replies (CASCADE will handle this)
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { error } = await (supabase as any)
+                    .from('blog_comments')
+                    .delete()
+                    .eq('id', commentId);
+
+                if (error) {
+                    return errorResponse(error.message, 400, rateLimitInfo);
+                }
+
+                return successResponse({ message: 'Comment deleted successfully' }, 200, rateLimitInfo);
+            } catch (err) {
+                console.error('Error deleting comment:', err);
+                return errorResponse('Internal server error', 500, rateLimitInfo);
+            }
+        },
+        { requireAdmin: true }
+    );
 }
 
 // Helper: Build nested comments
@@ -181,3 +219,4 @@ function buildNestedComments(comments: Comment[]): NestedComment[] {
 
     return rootComments;
 }
+

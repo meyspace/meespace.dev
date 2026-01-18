@@ -193,8 +193,8 @@ export function ExperienceModal({ isOpen, onClose, onSuccess, editData }: Experi
                         </button>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6">
+                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                        <div className="p-8 overflow-y-auto flex-1 min-h-0 custom-scrollbar space-y-6">
 
                             <div>
                                 <label className="block text-sm font-semibold text-text-main dark:text-gray-300 mb-2">

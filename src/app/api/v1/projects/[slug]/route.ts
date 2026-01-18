@@ -24,24 +24,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
             const url = new URL(req.url);
             const isAdmin = url.searchParams.get('admin') === 'true';
 
+            // Simplified query - only core project data first
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             let query = (supabase as any)
                 .from('projects')
-                .select(`
-                    *,
-                    project_tag_relations (
-                        project_tags (*)
-                    ),
-                    project_deliverables (*),
-                    project_outcomes (*),
-                    project_tech_stack (
-                        tech_stack (*)
-                    ),
-                    project_navigation (
-                        prev_project:prev_project_id (id, slug, title, icon, icon_color),
-                        next_project:next_project_id (id, slug, title, icon, icon_color)
-                    )
-                `)
+                .select('*')
                 .eq('slug', slug)
                 .single();
 
@@ -52,8 +39,33 @@ export async function GET(request: NextRequest, context: RouteContext) {
             const { data: project, error } = await query;
 
             if (error || !project) {
+                console.error('Project not found error:', error);
                 return errorResponse('Project not found', 404, rateLimitInfo);
             }
+
+            // Fetch related data separately to avoid issues with missing tables
+            let deliverables: unknown[] = [];
+            let outcomes: unknown[] = [];
+
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: delData } = await (supabase as any)
+                    .from('project_deliverables')
+                    .select('*')
+                    .eq('project_id', project.id)
+                    .order('display_order');
+                deliverables = delData || [];
+            } catch { /* table may not exist */ }
+
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const { data: outData } = await (supabase as any)
+                    .from('project_outcomes')
+                    .select('*')
+                    .eq('project_id', project.id)
+                    .order('display_order');
+                outcomes = outData || [];
+            } catch { /* table may not exist */ }
 
             // Increment view count for published projects
             if (project.status === 'published') {
@@ -64,19 +76,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
                     .eq('id', project.id);
             }
 
-            // Transform nested relations
+            // Return project with related data
             const transformedProject = {
                 ...project,
-                tags: project.project_tag_relations?.map((rel: { project_tags: unknown }) => rel.project_tags) || [],
-                deliverables: project.project_deliverables || [],
-                outcomes: project.project_outcomes || [],
-                techStack: project.project_tech_stack?.map((rel: { tech_stack: unknown }) => rel.tech_stack) || [],
-                navigation: project.project_navigation?.[0] || null,
-                project_tag_relations: undefined,
-                project_deliverables: undefined,
-                project_outcomes: undefined,
-                project_tech_stack: undefined,
-                project_navigation: undefined,
+                deliverables,
+                outcomes,
             };
 
             return successResponse(transformedProject, 200, rateLimitInfo);
@@ -137,7 +141,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
                 if (tags && Array.isArray(tags)) {
                     // Remove existing tags
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
+                    await (supabase as any)
                         .from('project_tag_relations')
                         .delete()
                         .eq('project_id', project.id);
@@ -156,7 +160,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
                 // Update deliverables if provided
                 if (deliverables && Array.isArray(deliverables)) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
+                    await (supabase as any)
                         .from('project_deliverables')
                         .delete()
                         .eq('project_id', project.id);
@@ -174,7 +178,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
                 // Update outcomes if provided
                 if (outcomes && Array.isArray(outcomes)) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
+                    await (supabase as any)
                         .from('project_outcomes')
                         .delete()
                         .eq('project_id', project.id);
@@ -192,7 +196,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
                 // Update tech stack if provided
                 if (techStack && Array.isArray(techStack)) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
+                    await (supabase as any)
                         .from('project_tech_stack')
                         .delete()
                         .eq('project_id', project.id);
@@ -229,10 +233,10 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
                 const supabase = await createClient();
 
                 const { error } = // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                await (supabase as any)
-                    .from('projects')
-                    .delete()
-                    .eq('slug', slug);
+                    await (supabase as any)
+                        .from('projects')
+                        .delete()
+                        .eq('slug', slug);
 
                 if (error) {
                     return errorResponse(error.message, 400, rateLimitInfo);

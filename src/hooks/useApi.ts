@@ -129,7 +129,15 @@ export async function apiCall<T>(
             body: body ? JSON.stringify(body) : undefined,
         });
 
-        const result = await response.json();
+        // Handle empty responses gracefully
+        const text = await response.text();
+        let result;
+        try {
+            result = text ? JSON.parse(text) : {};
+        } catch {
+            console.error('Failed to parse JSON response:', text);
+            return { success: false, error: 'Invalid response from server' };
+        }
 
         if (!response.ok) {
             return { success: false, error: result.error || 'Request failed' };

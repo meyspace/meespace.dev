@@ -16,14 +16,20 @@ export async function GET(request: NextRequest) {
             const supabase = await createClient();
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data, error } = await (supabase as any)
+            const { data, error } = await (supabase as any)
                 .from('site_settings')
                 .select('*')
                 .limit(1)
                 .single();
 
-            if (error) {
-                return errorResponse('Settings not found', 404, rateLimitInfo);
+            if (error || !data) {
+                // Return default settings if none exist
+                return successResponse({
+                    site_name: 'Portfolio',
+                    site_tagline: '',
+                    seo_title: '',
+                    seo_description: '',
+                }, 200, rateLimitInfo);
             }
 
             return successResponse(data, 200, rateLimitInfo);
@@ -57,7 +63,7 @@ export async function PUT(request: NextRequest) {
                 if (!existingSettings) {
                     // Create new settings if doesn't exist
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const { data, error } = await (supabase as any)
+                    const { data, error } = await (supabase as any)
                         .from('site_settings')
                         .insert(body)
                         .select()

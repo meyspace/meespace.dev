@@ -36,8 +36,19 @@ ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS content_format VARCHAR(20) DEFAU
 ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
 
 -- ============================================================================
--- EDUCATION TABLE - Add all missing columns (using 'school' as per schema)
+-- EDUCATION TABLE - Add all missing columns (ensure 'school' exists)
 -- ============================================================================
+-- First, add school column if it doesn't exist
+ALTER TABLE education ADD COLUMN IF NOT EXISTS school VARCHAR(255);
+
+-- If data was stored in 'institution' column, copy to 'school' (optional)
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'education' AND column_name = 'institution') THEN
+        UPDATE education SET school = institution WHERE school IS NULL;
+    END IF;
+END $$;
+
 ALTER TABLE education ADD COLUMN IF NOT EXISTS field_of_study VARCHAR(255);
 ALTER TABLE education ADD COLUMN IF NOT EXISTS location VARCHAR(255);
 ALTER TABLE education ADD COLUMN IF NOT EXISTS description TEXT;

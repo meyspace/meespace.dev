@@ -70,10 +70,12 @@ export function BlogModal({ isOpen, onClose, onSuccess, editData }: BlogModalPro
         fetchCategories();
     }, []);
 
+    // Handle modal open/close and form data initialization
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
             setActiveTab('basic');
+            // Reset form immediately when opening
             if (editData) {
                 setFormData({
                     id: editData.id,
@@ -149,7 +151,8 @@ export function BlogModal({ isOpen, onClose, onSuccess, editData }: BlogModalPro
 
         let result;
         if (editData?.id) {
-            result = await apiCall(`/api/v1/blog?id=${editData.id}`, { method: 'PUT', body: payload });
+            // Use slug-based endpoint for updating
+            result = await apiCall(`/api/v1/blog/${editData.slug}`, { method: 'PUT', body: payload });
         } else {
             result = await apiCall('/api/v1/blog', { method: 'POST', body: payload });
         }
@@ -208,8 +211,8 @@ export function BlogModal({ isOpen, onClose, onSuccess, editData }: BlogModalPro
                         ))}
                     </div>
 
-                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                    <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+                        <div className="p-8 overflow-y-auto custom-scrollbar space-y-6 flex-1 min-h-0">
 
                             {/* TAB: Basic Info */}
                             {activeTab === 'basic' && (
