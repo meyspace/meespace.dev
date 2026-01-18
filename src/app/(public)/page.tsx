@@ -173,10 +173,40 @@ const blogCardStyles = [
 // Blog card icons by index
 const blogCardIcons = ['article', 'groups', 'rocket_launch'];
 
-export const metadata: Metadata = {
-  title: "Portfolio",
-  description: "Personal portfolio website",
-};
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+
+  const siteName = settings?.site_name || 'MeySpace';
+  const title = settings?.seo_title || `${siteName} | Portfolio`;
+  const description = settings?.seo_description || 'Personal portfolio website showcasing projects, insights, and professional experience.';
+  const ogImage = settings?.og_image_url || `${baseUrl}/og-image.png`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: 'website',
+      title,
+      description,
+      url: baseUrl,
+      siteName,
+      images: [{
+        url: ogImage,
+        width: 1200,
+        height: 630,
+        alt: title
+      }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function Home() {
   const [profile, projects, techStack, posts, skills, stats, settings] = await Promise.all([

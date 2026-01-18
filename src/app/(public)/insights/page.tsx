@@ -28,10 +28,46 @@ async function getBlogPosts(): Promise<BlogPost[]> {
     }
 }
 
-export const metadata: Metadata = {
-    title: "Insights & Blog",
-    description: "Thoughts, tutorials, and industry insights.",
-};
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+async function getSettings() {
+    try {
+        const res = await fetch(`${baseUrl}/api/v1/settings`, { next: { revalidate: 60 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.data;
+    } catch {
+        return null;
+    }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    const settings = await getSettings();
+    const siteName = settings?.site_name || 'MeySpace';
+    const ogImage = settings?.og_image_url || `${baseUrl}/og-image.png`;
+
+    const title = 'Insights & Blog';
+    const description = 'Thoughts, tutorials, and industry insights on technology and business analysis.';
+
+    return {
+        title,
+        description,
+        openGraph: {
+            type: 'website',
+            title: `${title} | ${siteName}`,
+            description,
+            url: `${baseUrl}/insights`,
+            siteName,
+            images: [{ url: ogImage, width: 1200, height: 630, alt: `${siteName} Blog` }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${title} | ${siteName}`,
+            description,
+            images: [ogImage],
+        },
+    };
+}
 
 export default async function InsightsPage() {
     const posts = await getBlogPosts();

@@ -78,10 +78,46 @@ async function fetchData() {
     }
 }
 
-export const metadata: Metadata = {
-    title: "About",
-    description: "Learn more about me and my journey.",
-};
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+
+async function getSettings() {
+    try {
+        const res = await fetch(`${baseUrl}/api/v1/settings`, { next: { revalidate: 60 } });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.data;
+    } catch {
+        return null;
+    }
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+    const settings = await getSettings();
+    const siteName = settings?.site_name || 'MeySpace';
+    const ogImage = settings?.og_image_url || `${baseUrl}/og-image.png`;
+
+    const title = 'About';
+    const description = 'Learn more about my professional journey, skills, certifications, and experience.';
+
+    return {
+        title,
+        description,
+        openGraph: {
+            type: 'profile',
+            title: `${title} | ${siteName}`,
+            description,
+            url: `${baseUrl}/about`,
+            siteName,
+            images: [{ url: ogImage, width: 1200, height: 630, alt: `About ${siteName}` }],
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${title} | ${siteName}`,
+            description,
+            images: [ogImage],
+        },
+    };
+}
 
 // Helper to format date range for experience
 function formatDateRange(startDate: string, endDate?: string, isCurrent?: boolean): string {

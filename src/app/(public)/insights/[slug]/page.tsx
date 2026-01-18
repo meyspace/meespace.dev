@@ -83,29 +83,42 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         return { title: "Insight Not Found" };
     }
 
+    // Fetch settings for consistent site name
+    let siteName = 'MeySpace';
+    try {
+        const res = await fetch(`${baseUrl}/api/v1/settings`, { next: { revalidate: 60 } });
+        if (res.ok) {
+            const data = await res.json();
+            siteName = data.data?.site_name || 'MeySpace';
+        }
+    } catch { /* use default */ }
+
     const title = `${post.title} - Insights`;
     const description = post.excerpt || post.title;
     const url = `${baseUrl}/insights/${post.slug}`;
-    const imageUrl = post.featured_image_url || `${baseUrl}/og-default.png`;
+    const imageUrl = post.featured_image_url || `${baseUrl}/og-image.png`;
+    const authorName = post.author_name || post.author?.full_name || 'Author';
 
     return {
         title,
         description,
-        authors: [{ name: post.author_name || post.author?.full_name || 'Author' }],
+        authors: [{ name: authorName }],
         openGraph: {
             type: 'article',
             title,
             description,
             url,
-            siteName: 'My Portfolio',
+            siteName,
             images: [{ url: imageUrl, width: 1200, height: 630, alt: post.title }],
             publishedTime: post.published_at || post.created_at,
+            authors: [authorName],
         },
         twitter: {
             card: 'summary_large_image',
             title,
             description,
-            images: [imageUrl],
+            images: [{ url: imageUrl, alt: post.title }],
+            creator: `@${siteName.toLowerCase().replace(/\s/g, '')}`,
         },
         alternates: { canonical: url },
     };
