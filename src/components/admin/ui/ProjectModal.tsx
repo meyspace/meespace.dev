@@ -41,6 +41,7 @@ interface Project {
     featured_image_url?: string;
     problem_statement?: string;
     solution_description?: string;
+    gallery_images?: { url: string; alt?: string; caption?: string }[];
 }
 
 interface ProjectModalProps {
@@ -75,6 +76,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
         featured_image_url: '',
         problem_statement: '',
         solution_description: '',
+        gallery_images: [],
     });
 
     // Deliverables & Outcomes
@@ -115,6 +117,7 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
                                 deliverables?: Deliverable[];
                                 outcomes?: Outcome[];
                                 images?: { image_url: string }[];
+                                gallery_images?: { url: string }[];
                             };
                             if (projectData.deliverables) {
                                 setDeliverables(projectData.deliverables);
@@ -122,7 +125,11 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
                             if (projectData.outcomes) {
                                 setOutcomes(projectData.outcomes);
                             }
-                            if (projectData.images) {
+                            // Load gallery_images from DB
+                            if (projectData.gallery_images && projectData.gallery_images.length > 0) {
+                                setProjectImages(projectData.gallery_images.map(img => img.url));
+                            } else if (projectData.images) {
+                                // Fallback for legacy 'images' field
                                 setProjectImages(projectData.images.map(img => img.image_url));
                             }
                         }
@@ -222,6 +229,9 @@ export function ProjectModal({ isOpen, onClose, onSuccess, editData }: ProjectMo
             featured_image_url: formData.featured_image_url || null,
             problem_statement: formData.problem_statement || null,
             solution_description: formData.solution_description || null,
+            gallery_images: projectImages.length > 0
+                ? projectImages.map(url => ({ url, alt: '', caption: '' }))
+                : null,
         };
 
         let result;

@@ -1,5 +1,8 @@
 import { BentoCard } from "@/components/public/BentoCard";
 import { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { Download } from "lucide-react";
 
 interface Experience {
     id: string;
@@ -41,39 +44,37 @@ interface Certification {
     credential_url?: string;
     certificate_file_url?: string;
     icon?: string;
+    description?: string;
     is_expired?: boolean;
-}
-
-interface AboutContent {
-    section_key: string;
-    title?: string;
-    content?: Record<string, unknown>;
 }
 
 async function fetchData() {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
     try {
-        const [aboutRes, expRes, eduRes, certRes] = await Promise.all([
+        const [aboutRes, expRes, eduRes, certRes, profileRes] = await Promise.all([
             fetch(`${baseUrl}/api/v1/about`, { next: { revalidate: 60 } }),
             fetch(`${baseUrl}/api/v1/experiences`, { next: { revalidate: 60 } }),
             fetch(`${baseUrl}/api/v1/education`, { next: { revalidate: 60 } }),
             fetch(`${baseUrl}/api/v1/certifications`, { next: { revalidate: 60 } }),
+            fetch(`${baseUrl}/api/v1/profile`, { next: { revalidate: 60 } }),
         ]);
 
         const aboutData = aboutRes.ok ? await aboutRes.json() : { data: {} };
         const expData = expRes.ok ? await expRes.json() : { data: { experiences: [] } };
         const eduData = eduRes.ok ? await eduRes.json() : { data: { education: [] } };
         const certData = certRes.ok ? await certRes.json() : { data: { certifications: [] } };
+        const profileData = profileRes.ok ? await profileRes.json() : { data: null };
 
         return {
             about: aboutData.data || {},
             experiences: expData.data?.experiences || expData.experiences || [],
             education: eduData.data?.education || eduData.education || [],
             certifications: certData.data?.certifications || certData.certifications || [],
+            profile: profileData.data || null,
         };
     } catch {
-        return { about: {}, experiences: [], education: [], certifications: [] };
+        return { about: {}, experiences: [], education: [], certifications: [], profile: null };
     }
 }
 
@@ -82,35 +83,75 @@ export const metadata: Metadata = {
     description: "Learn more about me and my journey.",
 };
 
-// Helper to format dates
+// Helper to format date range for experience
 function formatDateRange(startDate: string, endDate?: string, isCurrent?: boolean): string {
     const start = new Date(startDate);
-    const startStr = start.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+    const startYear = start.getFullYear();
 
-    if (isCurrent) return `${startStr} - Present`;
-    if (!endDate) return startStr;
+    if (isCurrent) return `${startYear} - Present`;
+    if (!endDate) return String(startYear);
 
     const end = new Date(endDate);
-    const endStr = end.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    return `${startStr} - ${endStr}`;
+    return `${startYear} - ${end.getFullYear()}`;
 }
 
-export default async function AboutPage() {
-    const { about, experiences, education, certifications } = await fetchData();
+// Get year from issue_date
+function getYear(dateStr: string): string {
+    try {
+        return String(new Date(dateStr).getFullYear());
+    } catch {
+        return "";
+    }
+}
 
-    // Extract about sections - data comes as flat columns from DB, not content object
+// Certification color by index
+const certColors = [
+    { bg: "bg-blue-50 dark:bg-blue-900/20", text: "text-blue-600 dark:text-blue-400", badge: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20" },
+    { bg: "bg-purple-50 dark:bg-purple-900/20", text: "text-purple-600 dark:text-purple-400", badge: "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20" },
+    { bg: "bg-orange-50 dark:bg-orange-900/20", text: "text-orange-600 dark:text-orange-400", badge: "text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20" },
+];
+
+// Default content for hardcoded fallback
+const defaultContent = {
+    header: {
+        title: "Behind the Analysis",
+        subtitle: "My journey from curiosity to architecting business solutions."
+    },
+    story: {
+        tag: "Story",
+        year: "Est. 2018",
+        title: "It started with a broken spreadsheet.",
+        paragraphs: [
+            "My path into tech wasn't traditional. While working in operations, I noticed my team spending hours manually reconciling data across three different systems. I couldn't ignore the inefficiency.",
+            "I taught myself SQL on weekends to automate those reports. That first 'aha' moment—seeing a 4-hour task turn into a 5-second query—hooked me on problem-solving. Today, I bring that same relentless drive for efficiency to enterprise-scale systems."
+        ]
+    },
+    funFact: {
+        title: "Fun Fact",
+        description: "I'm an avid puzzle solver. I recently completed a 3,000-piece map of the world without looking at the box picture. It taught me patience and pattern recognition!"
+    },
+    offline: {
+        title: "Offline Mode",
+        description: "When I'm not mapping processes, I'm mapping trails. I spend my weekends hiking the Catskills—nature is the best system reset."
+    }
+};
+
+export default async function AboutPage() {
+    const { about, experiences, education, certifications, profile } = await fetchData();
+
+    // Extract about sections
     const sections = about.sections || {};
 
     // Header section
     const headerData = sections.header || {};
     const header = {
-        title: headerData.title || "About Me",
-        subtitle: headerData.subtitle || "My journey and experiences"
+        title: headerData.title || defaultContent.header.title,
+        subtitle: headerData.subtitle || defaultContent.header.subtitle
     };
 
-    // Story section - parse content as JSON string of paragraphs
+    // Story section
     const storyData = sections.story || {};
-    let storyParagraphs = ["Add your story in the admin panel."];
+    let storyParagraphs = defaultContent.story.paragraphs;
     try {
         if (storyData.content) {
             const parsed = JSON.parse(storyData.content);
@@ -119,29 +160,28 @@ export default async function AboutPage() {
             }
         }
     } catch {
-        // If content is not JSON, treat as single paragraph
         if (storyData.content) storyParagraphs = [storyData.content];
     }
     const story = {
-        title: storyData.title || "My Story",
+        title: storyData.title || defaultContent.story.title,
         content: storyParagraphs,
-        image: storyData.image_url || "",
-        tag: storyData.story_tag || "Background",
-        year: storyData.story_year || "Present"
+        image: storyData.image_url || profile?.avatar_url || "",
+        tag: storyData.story_tag || defaultContent.story.tag,
+        year: storyData.story_year || defaultContent.story.year
     };
 
     // Fun Fact section
     const funFactData = sections.funFact || {};
     const funFact = {
-        title: funFactData.title || "Fun Fact",
-        description: funFactData.content || "Add a fun fact in the admin panel."
+        title: funFactData.title || defaultContent.funFact.title,
+        description: funFactData.content || defaultContent.funFact.description
     };
 
     // Offline section
     const offlineData = sections.offline || {};
     const offline = {
-        title: offlineData.title || "When Offline",
-        description: offlineData.content || "Add your hobbies in the admin panel."
+        title: offlineData.title || defaultContent.offline.title,
+        description: offlineData.content || defaultContent.offline.description
     };
 
     // Get first education as primary degree
@@ -149,27 +189,38 @@ export default async function AboutPage() {
 
     return (
         <div className="w-full">
+            {/* Page Header */}
             <div className="mb-10 text-center md:text-left">
                 <h2 className="text-3xl md:text-5xl font-bold text-text-main dark:text-white mb-3">
-                    {header.title || "About Me"}
+                    {header.title}
                 </h2>
                 <p className="text-text-muted dark:text-gray-400 text-lg max-w-2xl">
-                    {header.subtitle || "My journey and experiences"}
+                    {header.subtitle}
                 </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-min">
-                {/* Story Card */}
-                <BentoCard className="col-span-1 md:col-span-2 row-span-1 bg-white dark:bg-[#1e1e1e] p-8 flex flex-col justify-between relative overflow-hidden group">
+                {/* Story Card - 2 columns */}
+                <BentoCard className="col-span-1 md:col-span-2 p-8 flex flex-col justify-between relative overflow-hidden">
                     <div className="relative z-10 flex flex-col md:flex-row gap-8 items-start">
                         <div className="size-24 md:size-32 shrink-0 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-sm relative bg-gray-200 dark:bg-gray-700">
-                            {story.image && (
-                                <img alt="Portrait" className="w-full h-full object-cover" src={story.image} />
+                            {story.image ? (
+                                <Image
+                                    src={story.image}
+                                    alt="Portrait"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 96px, 128px"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                    <span className="material-symbols-outlined text-4xl">person</span>
+                                </div>
                             )}
                         </div>
                         <div className="flex-1">
                             <div className="flex items-center gap-3 mb-4">
-                                <span className="px-3 py-1 rounded-full bg-accent-sage text-green-900 text-xs font-semibold">
+                                <span className="px-3 py-1 rounded-full bg-[#d1e2d8] text-green-900 text-xs font-semibold">
                                     {story.tag}
                                 </span>
                                 <span className="text-sm text-text-muted dark:text-gray-400 font-medium">
@@ -179,18 +230,18 @@ export default async function AboutPage() {
                             <h3 className="text-2xl font-bold text-text-main dark:text-white mb-4">
                                 {story.title}
                             </h3>
-                            {(story.content || []).map((paragraph: string, idx: number) => (
-                                <p key={idx} className={`text-text-muted dark:text-gray-400 leading-relaxed ${idx < (story.content?.length || 0) - 1 ? "mb-4" : ""}`}>
+                            {story.content.map((paragraph: string, idx: number) => (
+                                <p key={idx} className={`text-text-muted dark:text-gray-400 leading-relaxed ${idx < story.content.length - 1 ? "mb-4" : ""}`}>
                                     {paragraph}
                                 </p>
                             ))}
                         </div>
                     </div>
-                    <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-all duration-500 pointer-events-none"></div>
+                    <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
                 </BentoCard>
 
                 {/* Fun Fact Card */}
-                <BentoCard className="col-span-1 bg-accent-purple/30 dark:bg-purple-900/10 p-6 flex flex-col justify-between border border-accent-purple/50 dark:border-purple-800/30">
+                <BentoCard className="col-span-1 !bg-accent-purple/30 dark:!bg-purple-900/10 p-6 flex flex-col justify-between !border-accent-purple/50 dark:!border-purple-800/30">
                     <div className="flex justify-between items-start">
                         <div className="size-10 rounded-full bg-white dark:bg-purple-900/50 flex items-center justify-center text-purple-600 dark:text-purple-300">
                             <span className="material-symbols-outlined">lightbulb</span>
@@ -202,124 +253,92 @@ export default async function AboutPage() {
                     </div>
                 </BentoCard>
 
-                {/* Education & Certs Card - NOW FROM REAL DATA */}
-                <BentoCard className="col-span-1 md:col-span-1 md:row-span-2 bg-white dark:bg-[#1e1e1e] p-6 flex flex-col gap-6">
-                    <div className="flex items-center gap-3 pb-4 border-b border-gray-100 dark:border-gray-800">
-                        <div className="size-10 rounded-full bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-300">
-                            <span className="material-symbols-outlined">school</span>
-                        </div>
-                        <h3 className="font-bold text-text-main dark:text-white text-lg">Education & Certs</h3>
-                    </div>
-                    <div className="flex flex-col gap-5">
-                        {/* Education List */}
-                        {education.length > 0 && (
-                            <div>
-                                <span className="text-xs font-semibold text-text-muted dark:text-gray-500 uppercase tracking-wider">Education</span>
-                                <div className="mt-2 space-y-3">
-                                    {education.map((edu: Education) => (
-                                        <div key={edu.id} className="p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                                            <h4 className="font-bold text-text-main dark:text-white text-sm">{edu.degree}</h4>
-                                            <p className="text-xs text-text-muted dark:text-gray-400 mt-1">
-                                                {edu.school || edu.institution}
-                                            </p>
-                                            {edu.field_of_study && (
-                                                <p className="text-xs text-text-muted dark:text-gray-400">{edu.field_of_study}</p>
-                                            )}
-                                            <div className="flex items-center gap-2 mt-1">
-                                                <span className="text-xs text-text-muted dark:text-gray-500">
-                                                    {edu.start_year} - {edu.end_year || 'Present'}
-                                                </span>
-                                                {edu.gpa && (
-                                                    <span className="text-xs px-1.5 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded">
-                                                        GPA: {edu.gpa}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {edu.achievements && edu.achievements.length > 0 && (
-                                                <ul className="mt-2 space-y-1">
-                                                    {edu.achievements.map((ach: string, aIdx: number) => (
-                                                        <li key={aIdx} className="text-xs text-text-muted dark:text-gray-400 flex items-start gap-1">
-                                                            <span className="text-primary-dark">•</span> {ach}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </div>
-                                    ))}
+                {/* Certification Cards - 3 individual cards */}
+                {certifications.length > 0 ? (
+                    certifications.slice(0, 3).map((cert: Certification, idx: number) => {
+                        const color = certColors[idx % certColors.length];
+                        const icons = ["verified_user", "badge", "cloud"];
+                        const icon = cert.icon || icons[idx % icons.length];
+
+                        return (
+                            <BentoCard key={cert.id} className="col-span-1 p-6 flex flex-col gap-4">
+                                <div className="flex items-start justify-between">
+                                    <div className={`p-2 ${color.bg} rounded-lg ${color.text}`}>
+                                        <span className="material-symbols-outlined text-2xl">{icon}</span>
+                                    </div>
+                                    <span className={`text-xs font-semibold ${color.badge} px-2 py-1 rounded`}>
+                                        {getYear(cert.issue_date)}
+                                    </span>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Certifications List */}
-                        {certifications.length > 0 && (
-                            <div>
-                                <span className="text-xs font-semibold text-text-muted dark:text-gray-500 uppercase tracking-wider">Certifications</span>
-                                <div className="mt-2 space-y-3">
-                                    {certifications.map((cert: Certification) => (
-                                        <div key={cert.id} className="flex items-start gap-3 p-3 border border-gray-100 dark:border-gray-700 rounded-lg hover:border-primary/50 transition-colors">
-                                            <div className="mt-0.5 text-blue-600 dark:text-blue-400">
-                                                <span className="material-symbols-outlined text-[20px]">
-                                                    {cert.icon || 'verified'}
-                                                </span>
-                                            </div>
-                                            <div className="flex-1">
-                                                <h4 className="font-bold text-text-main dark:text-white text-sm">
-                                                    {cert.name}
-                                                    {cert.short_name && (
-                                                        <span className="ml-2 text-xs text-text-muted font-normal">({cert.short_name})</span>
-                                                    )}
-                                                </h4>
-                                                {cert.subtitle && (
-                                                    <p className="text-xs text-text-muted dark:text-gray-400">{cert.subtitle}</p>
-                                                )}
-                                                <p className="text-xs text-text-muted dark:text-gray-400">{cert.issuer}</p>
-                                                <div className="flex items-center gap-2 mt-1">
-                                                    <span className="text-xs text-text-muted dark:text-gray-500">
-                                                        {new Date(cert.issue_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                                    </span>
-                                                    {cert.is_expired && (
-                                                        <span className="text-xs px-1.5 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded">Expired</span>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-wrap gap-2 mt-2">
-                                                    {cert.credential_url && (
-                                                        <a
-                                                            href={cert.credential_url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-xs text-sage-green hover:underline flex items-center gap-1"
-                                                        >
-                                                            <span className="material-symbols-outlined text-sm">open_in_new</span>
-                                                            View Credential
-                                                        </a>
-                                                    )}
-                                                    {cert.certificate_file_url && (
-                                                        <a
-                                                            href={cert.certificate_file_url}
-                                                            target="_blank"
-                                                            rel="noopener noreferrer"
-                                                            className="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                                        >
-                                                            <span className="material-symbols-outlined text-sm">description</span>
-                                                            View Certificate
-                                                        </a>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
+                                <div>
+                                    <h4 className="font-bold text-text-main dark:text-white text-lg">
+                                        {cert.short_name || cert.name}
+                                    </h4>
+                                    <p className="text-xs text-text-muted dark:text-gray-400 font-medium">
+                                        {cert.subtitle || cert.issuer}
+                                    </p>
+                                    {cert.description && (
+                                        <p className="text-sm text-text-muted dark:text-gray-500 mt-3 leading-snug">
+                                            {cert.description}
+                                        </p>
+                                    )}
                                 </div>
+                            </BentoCard>
+                        );
+                    })
+                ) : (
+                    // Fallback hardcoded certs
+                    <>
+                        <BentoCard className="col-span-1 p-6 flex flex-col gap-4">
+                            <div className="flex items-start justify-between">
+                                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-blue-600 dark:text-blue-400">
+                                    <span className="material-symbols-outlined text-2xl">verified_user</span>
+                                </div>
+                                <span className="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">2023</span>
                             </div>
-                        )}
+                            <div>
+                                <h4 className="font-bold text-text-main dark:text-white text-lg">CSPO®</h4>
+                                <p className="text-xs text-text-muted dark:text-gray-400 font-medium">Certified Scrum Product Owner</p>
+                                <p className="text-sm text-text-muted dark:text-gray-500 mt-3 leading-snug">
+                                    Mastered backlog prioritization, stakeholder management, and maximizing value delivery in Agile environments.
+                                </p>
+                            </div>
+                        </BentoCard>
+                        <BentoCard className="col-span-1 p-6 flex flex-col gap-4">
+                            <div className="flex items-start justify-between">
+                                <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg text-purple-600 dark:text-purple-400">
+                                    <span className="material-symbols-outlined text-2xl">badge</span>
+                                </div>
+                                <span className="text-xs font-semibold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded">2022</span>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-text-main dark:text-white text-lg">IIBA-CBAP</h4>
+                                <p className="text-xs text-text-muted dark:text-gray-400 font-medium">Certified Business Analysis Professional</p>
+                                <p className="text-sm text-text-muted dark:text-gray-500 mt-3 leading-snug">
+                                    Deep dive into requirements lifecycle management, strategy analysis, and solution evaluation techniques.
+                                </p>
+                            </div>
+                        </BentoCard>
+                        <BentoCard className="col-span-1 p-6 flex flex-col gap-4">
+                            <div className="flex items-start justify-between">
+                                <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg text-orange-600 dark:text-orange-400">
+                                    <span className="material-symbols-outlined text-2xl">cloud</span>
+                                </div>
+                                <span className="text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded">2021</span>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-text-main dark:text-white text-lg">AWS Certified</h4>
+                                <p className="text-xs text-text-muted dark:text-gray-400 font-medium">Cloud Practitioner</p>
+                                <p className="text-sm text-text-muted dark:text-gray-500 mt-3 leading-snug">
+                                    Gained foundational knowledge of cloud architecture, deployment services, and security best practices.
+                                </p>
+                            </div>
+                        </BentoCard>
+                    </>
+                )}
 
-                        {education.length === 0 && certifications.length === 0 && (
-                            <p className="text-text-muted text-sm text-center py-4">Add education & certifications in the admin panel.</p>
-                        )}
-                    </div>
-                </BentoCard>
-
-                {/* Experience Roadmap Card - NOW FROM REAL DATA */}
-                <BentoCard className="col-span-1 md:col-span-2 row-span-2 bg-white dark:bg-[#1e1e1e] p-8">
+                {/* Experience Roadmap Card - 2 columns */}
+                <BentoCard className="col-span-1 md:col-span-2 p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div className="flex items-center gap-3">
                             <div className="size-10 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-300">
@@ -327,69 +346,141 @@ export default async function AboutPage() {
                             </div>
                             <h3 className="font-bold text-text-main dark:text-white text-xl">Experience Roadmap</h3>
                         </div>
+                        {profile?.resume_url && (
+                            <a
+                                href={profile.resume_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-sm text-primary-dark font-semibold hover:text-text-main transition-colors flex items-center gap-1"
+                            >
+                                Download CV <Download className="w-4 h-4" />
+                            </a>
+                        )}
                     </div>
-                    {experiences.length === 0 ? (
-                        <p className="text-text-muted text-center py-8">Add your experiences in the admin panel.</p>
-                    ) : (
-                        <div className="relative pl-4 md:pl-8 space-y-10">
-                            <div className="absolute left-[23px] md:left-[39px] top-2 bottom-2 w-[2px] bg-gray-200 dark:bg-gray-800"></div>
-                            {experiences.map((exp: Experience, idx: number) => (
-                                <div key={exp.id} className="relative pl-8">
-                                    <div className={`absolute -left-[9px] top-1.5 w-5 h-5 rounded-full border-4 border-white dark:border-[#1e1e1e] shadow-sm z-10 ${idx === 0 ? "bg-blue-500" : "bg-gray-300 dark:bg-gray-600"}`}></div>
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <h4 className="text-lg font-bold text-text-main dark:text-white">{exp.title}</h4>
-                                            {exp.employment_type && (
-                                                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
-                                                    {exp.employment_type}
+
+                    {experiences.length > 0 ? (
+                        <div className="space-y-8">
+                            {experiences.map((exp: Experience, idx: number) => {
+                                const isFirst = idx === 0;
+                                const iconBg = isFirst
+                                    ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400";
+                                const icons = ["manage_accounts", "analytics", "terminal"];
+                                const icon = icons[idx % icons.length];
+
+                                return (
+                                    <div key={exp.id} className="flex flex-col sm:flex-row gap-5 group">
+                                        <div className="shrink-0">
+                                            <div className={`size-14 rounded-2xl ${iconBg} flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300`}>
+                                                <span className="material-symbols-outlined text-3xl">{icon}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-text-main dark:text-white">{exp.title}</h4>
+                                                    <p className="text-text-muted dark:text-gray-400 text-sm font-medium">
+                                                        {exp.company}{exp.location && ` • ${exp.location}`}
+                                                    </p>
+                                                </div>
+                                                <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit mt-2 sm:mt-0 ${isFirst
+                                                    ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                                                    : "text-text-muted dark:text-gray-500 bg-gray-100 dark:bg-gray-800"
+                                                    }`}>
+                                                    {formatDateRange(exp.start_date, exp.end_date, exp.is_current)}
                                                 </span>
+                                            </div>
+                                            {exp.highlights && exp.highlights.length > 0 && (
+                                                <ul className="space-y-2 mt-3">
+                                                    {exp.highlights.map((highlight: string, hIdx: number) => (
+                                                        <li key={hIdx} className="flex items-start gap-2 text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                                            <span className={`material-symbols-outlined text-base mt-0.5 shrink-0 ${isFirst ? "text-green-500" : "text-gray-400"}`}>
+                                                                check_circle
+                                                            </span>
+                                                            <span dangerouslySetInnerHTML={{ __html: highlight }} />
+                                                        </li>
+                                                    ))}
+                                                </ul>
                                             )}
-                                            {exp.is_current && (
-                                                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
-                                                    Current
-                                                </span>
+                                            {exp.tags && exp.tags.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 mt-3">
+                                                    {exp.tags.map((tag: string, tIdx: number) => (
+                                                        <span key={tIdx} className="px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded border border-gray-200 dark:border-gray-700">
+                                                            {tag}
+                                                        </span>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
-                                        <span className={`text-sm font-medium px-3 py-1 rounded-full w-fit mt-1 sm:mt-0 ${idx === 0 ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20" : "text-text-muted dark:text-gray-500 bg-gray-100 dark:bg-gray-800"}`}>
-                                            {formatDateRange(exp.start_date, exp.end_date, exp.is_current)}
-                                        </span>
                                     </div>
-                                    <p className="text-text-muted dark:text-gray-400 text-sm font-medium mb-3">
-                                        {exp.company}
-                                        {exp.location && <span className="text-text-muted/70"> · {exp.location}</span>}
-                                    </p>
-                                    {exp.description && (
-                                        <p className="text-sm text-text-muted dark:text-gray-400 leading-relaxed mb-3">
-                                            {exp.description}
-                                        </p>
-                                    )}
-                                    {exp.highlights && exp.highlights.length > 0 && (
-                                        <ul className="text-sm text-text-muted dark:text-gray-400 space-y-1 mb-3">
-                                            {exp.highlights.map((highlight: string, hIdx: number) => (
-                                                <li key={hIdx} className="flex items-start gap-2">
-                                                    <span className="text-primary-dark mt-1">•</span>
-                                                    <span>{highlight}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    )}
-                                    {exp.tags && exp.tags.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {exp.tags.map((tag: string, tIdx: number) => (
-                                                <span key={tIdx} className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-xs font-medium text-text-muted">
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        // Hardcoded fallback experiences
+                        <div className="space-y-8">
+                            <div className="flex flex-col sm:flex-row gap-5 group">
+                                <div className="shrink-0">
+                                    <div className="size-14 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
+                                        <span className="material-symbols-outlined text-3xl">manage_accounts</span>
+                                    </div>
                                 </div>
-                            ))}
+                                <div className="flex-1">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+                                        <div>
+                                            <h4 className="text-lg font-bold text-text-main dark:text-white">Senior Business System Analyst</h4>
+                                            <p className="text-text-muted dark:text-gray-400 text-sm font-medium">FinTech Corp • New York, NY</p>
+                                        </div>
+                                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full w-fit mt-2 sm:mt-0">2021 - Present</span>
+                                    </div>
+                                    <ul className="space-y-2 mt-3">
+                                        <li className="flex items-start gap-2 text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                            <span className="material-symbols-outlined text-green-500 text-base mt-0.5 shrink-0">check_circle</span>
+                                            <span>Spearheaded the migration of legacy CRM to Salesforce, reducing data redundancy by <strong>40%</strong>.</span>
+                                        </li>
+                                        <li className="flex items-start gap-2 text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                            <span className="material-symbols-outlined text-green-500 text-base mt-0.5 shrink-0">check_circle</span>
+                                            <span>Led requirement gathering workshops for 5 major product releases.</span>
+                                        </li>
+                                    </ul>
+                                    <div className="flex flex-wrap gap-2 mt-3">
+                                        <span className="px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded border border-gray-200 dark:border-gray-700">JIRA</span>
+                                        <span className="px-2 py-1 bg-gray-50 dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-xs rounded border border-gray-200 dark:border-gray-700">Salesforce</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-5 group">
+                                <div className="shrink-0">
+                                    <div className="size-14 rounded-2xl bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
+                                        <span className="material-symbols-outlined text-3xl">analytics</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-2">
+                                        <div>
+                                            <h4 className="text-lg font-bold text-text-main dark:text-white">Business Analyst</h4>
+                                            <p className="text-text-muted dark:text-gray-400 text-sm font-medium">Global Logistics Ltd. • Chicago, IL</p>
+                                        </div>
+                                        <span className="text-sm font-medium text-text-muted dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full w-fit mt-2 sm:mt-0">2019 - 2021</span>
+                                    </div>
+                                    <ul className="space-y-2 mt-3">
+                                        <li className="flex items-start gap-2 text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                            <span className="material-symbols-outlined text-gray-400 text-base mt-0.5 shrink-0">check_circle</span>
+                                            <span>Optimized warehouse inventory tracking system, achieving a <strong>15% reduction</strong> in stock discrepancies.</span>
+                                        </li>
+                                        <li className="flex items-start gap-2 text-sm text-text-muted dark:text-gray-400 leading-relaxed">
+                                            <span className="material-symbols-outlined text-gray-400 text-base mt-0.5 shrink-0">check_circle</span>
+                                            <span>Created comprehensive documentation (BRD, FRD) for internal API integrations.</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </BentoCard>
 
                 {/* Offline Mode Card */}
-                <BentoCard className="col-span-1 bg-accent-rose/30 dark:bg-rose-900/10 p-6 flex flex-col justify-between border border-accent-rose/50 dark:border-rose-800/30">
+                <BentoCard className="col-span-1 !bg-[#fce1e4]/30 dark:!bg-rose-900/10 p-6 flex flex-col justify-between !border-[#fce1e4]/50 dark:!border-rose-800/30 h-fit">
                     <div className="flex justify-between items-start">
                         <div className="size-10 rounded-full bg-white dark:bg-rose-900/50 flex items-center justify-center text-rose-500 dark:text-rose-300">
                             <span className="material-symbols-outlined">hiking</span>
@@ -400,6 +491,57 @@ export default async function AboutPage() {
                         <p className="text-sm text-text-muted dark:text-rose-200">{offline.description}</p>
                     </div>
                 </BentoCard>
+
+                {/* Education Card - Full width */}
+                {primaryEducation && (
+                    <BentoCard className="col-span-1 md:col-span-3 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="flex flex-col md:flex-row md:items-center gap-6">
+                            <div className="size-16 rounded-xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
+                                <span className="material-symbols-outlined text-3xl">school</span>
+                            </div>
+                            <div>
+                                <span className="text-xs font-semibold text-text-muted dark:text-gray-500 uppercase tracking-wider">Education</span>
+                                <h3 className="text-xl md:text-2xl font-bold text-text-main dark:text-white mt-1">
+                                    {primaryEducation.degree}
+                                </h3>
+                                <p className="text-text-muted dark:text-gray-400 font-medium">
+                                    {primaryEducation.school || primaryEducation.institution}
+                                    {primaryEducation.achievements && primaryEducation.achievements.length > 0 && ` • ${primaryEducation.achievements[0]}`}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-start md:items-end gap-1">
+                            <span className="text-sm font-semibold text-text-main dark:text-white bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">
+                                Class of {primaryEducation.end_year || primaryEducation.start_year}
+                            </span>
+                            {primaryEducation.gpa && (
+                                <span className="text-xs text-text-muted dark:text-gray-500">
+                                    GPA: {primaryEducation.gpa}
+                                </span>
+                            )}
+                        </div>
+                    </BentoCard>
+                )}
+
+                {/* Fallback education if none from API */}
+                {!primaryEducation && (
+                    <BentoCard className="col-span-1 md:col-span-3 p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                        <div className="flex flex-col md:flex-row md:items-center gap-6">
+                            <div className="size-16 rounded-xl bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center text-orange-600 dark:text-orange-400 shrink-0">
+                                <span className="material-symbols-outlined text-3xl">school</span>
+                            </div>
+                            <div>
+                                <span className="text-xs font-semibold text-text-muted dark:text-gray-500 uppercase tracking-wider">Education</span>
+                                <h3 className="text-xl md:text-2xl font-bold text-text-main dark:text-white mt-1">B.S. Information Systems</h3>
+                                <p className="text-text-muted dark:text-gray-400 font-medium">University of Technology • Dean&apos;s List</p>
+                            </div>
+                        </div>
+                        <div className="flex flex-col items-start md:items-end gap-1">
+                            <span className="text-sm font-semibold text-text-main dark:text-white bg-gray-100 dark:bg-gray-800 px-4 py-2 rounded-lg">Class of 2018</span>
+                            <span className="text-xs text-text-muted dark:text-gray-500">Graduated Cum Laude</span>
+                        </div>
+                    </BentoCard>
+                )}
             </div>
         </div>
     );
