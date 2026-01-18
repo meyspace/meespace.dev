@@ -45,7 +45,7 @@ interface RelatedProject {
 async function getProject(slug: string): Promise<Project | null> {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-        const res = await fetch(`${baseUrl}/api/v1/projects/${slug}`, { next: { revalidate: 60 } });
+        const res = await fetch(`${baseUrl}/api/v1/projects/${slug}`, { cache: 'no-store' });
         if (!res.ok) return null;
         const data = await res.json();
         return data.data;
@@ -57,7 +57,7 @@ async function getProject(slug: string): Promise<Project | null> {
 async function getRelatedProjects(currentSlug: string): Promise<RelatedProject[]> {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-        const res = await fetch(`${baseUrl}/api/v1/projects?status=published&limit=4`, { next: { revalidate: 60 } });
+        const res = await fetch(`${baseUrl}/api/v1/projects?status=published&limit=4`, { cache: 'no-store' });
         if (!res.ok) return [];
         const data = await res.json();
         const projects = data.data?.projects || [];
@@ -70,7 +70,7 @@ async function getRelatedProjects(currentSlug: string): Promise<RelatedProject[]
 async function getProfile() {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-        const res = await fetch(`${baseUrl}/api/v1/profile`, { next: { revalidate: 60 } });
+        const res = await fetch(`${baseUrl}/api/v1/profile`, { cache: 'no-store' });
         if (!res.ok) return null;
         return (await res.json()).data;
     } catch {

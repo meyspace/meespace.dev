@@ -17,7 +17,7 @@ import {
 async function getProfile() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/profile`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/profile`, { cache: 'no-store' });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data;
@@ -29,7 +29,7 @@ async function getProfile() {
 async function getProjects() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/projects?status=published&limit=4`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/projects?status=published&limit=4`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data?.projects || [];
@@ -41,10 +41,10 @@ async function getProjects() {
 async function getTechStack() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/tech-stack`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/tech-stack`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
-    return data.data?.techStack?.slice(0, 6) || [];
+    return data.data?.techStack || [];
   } catch {
     return [];
   }
@@ -53,7 +53,7 @@ async function getTechStack() {
 async function getBlogPosts() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/blog?status=published&limit=4`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/blog?status=published&limit=4`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data?.posts || [];
@@ -65,7 +65,7 @@ async function getBlogPosts() {
 async function getSkills() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/skills`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/skills`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data?.skills || [];
@@ -77,7 +77,7 @@ async function getSkills() {
 async function getStats() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/stats`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/stats`, { cache: 'no-store' });
     if (!res.ok) return [];
     const data = await res.json();
     return data.data?.stats || [];
@@ -89,7 +89,7 @@ async function getStats() {
 async function getSettings() {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/v1/settings`, { next: { revalidate: 60 } });
+    const res = await fetch(`${baseUrl}/api/v1/settings`, { cache: 'no-store' });
     if (!res.ok) return null;
     const data = await res.json();
     return data.data;

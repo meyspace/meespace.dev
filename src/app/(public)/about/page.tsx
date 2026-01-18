@@ -53,11 +53,11 @@ async function fetchData() {
 
     try {
         const [aboutRes, expRes, eduRes, certRes, profileRes] = await Promise.all([
-            fetch(`${baseUrl}/api/v1/about`, { next: { revalidate: 60 } }),
-            fetch(`${baseUrl}/api/v1/experiences`, { next: { revalidate: 60 } }),
-            fetch(`${baseUrl}/api/v1/education`, { next: { revalidate: 60 } }),
-            fetch(`${baseUrl}/api/v1/certifications`, { next: { revalidate: 60 } }),
-            fetch(`${baseUrl}/api/v1/profile`, { next: { revalidate: 60 } }),
+            fetch(`${baseUrl}/api/v1/about`, { cache: 'no-store' }),
+            fetch(`${baseUrl}/api/v1/experiences`, { cache: 'no-store' }),
+            fetch(`${baseUrl}/api/v1/education`, { cache: 'no-store' }),
+            fetch(`${baseUrl}/api/v1/certifications`, { cache: 'no-store' }),
+            fetch(`${baseUrl}/api/v1/profile`, { cache: 'no-store' }),
         ]);
 
         const aboutData = aboutRes.ok ? await aboutRes.json() : { data: {} };

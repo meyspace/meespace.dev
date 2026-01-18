@@ -19,7 +19,7 @@ interface BlogPost {
 async function getBlogPosts(): Promise<BlogPost[]> {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-        const res = await fetch(`${baseUrl}/api/v1/blog?status=published`, { next: { revalidate: 60 } });
+        const res = await fetch(`${baseUrl}/api/v1/blog?status=published`, { cache: 'no-store' });
         if (!res.ok) return [];
         const data = await res.json();
         return data.data?.posts || [];
